@@ -909,148 +909,135 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:14
 </footer>
 
 <script>
-// ===================== DATA STATIS =====================
-const influencerData = [
-  {rank:1,name:'Jurnalis Watch ID',handle:'@jurnaliswatch',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'890K',reachN:890000,mention:142,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(59,130,246,.2)',avatarColor:'#60a5fa',spark:[3,5,4,7,6,9,8]},
-  {rank:2,name:'InfoPolri Official',handle:'@infopolri_id',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'720K',reachN:720000,mention:118,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(16,185,129,.2)',avatarColor:'#34d399',spark:[6,5,8,7,9,10,11]},
-  {rank:3,name:'Kompas News',handle:'@kompascom',platform:'news',icon:'📰',platTag:'platform-news',reach:'650K',reachN:650000,mention:98,senti:'neu',sentiLabel:'Netral',avatarBg:'rgba(245,158,11,.2)',avatarColor:'#fbbf24',spark:[8,7,9,8,7,8,6]},
-  {rank:4,name:'Aktivis HAM Indonesia',handle:'@ham_indonesia',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'510K',reachN:510000,mention:87,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(239,68,68,.2)',avatarColor:'#f87171',spark:[4,5,3,8,9,12,14]},
-  {rank:5,name:'DetikNews',handle:'@detikcom',platform:'news',icon:'📰',platTag:'platform-news',reach:'480K',reachN:480000,mention:76,senti:'neu',sentiLabel:'Netral',avatarBg:'rgba(6,182,212,.2)',avatarColor:'#22d3ee',spark:[7,8,6,7,9,8,7]},
-  {rank:6,name:'PolisiKita',handle:'@polisikita_id',platform:'tiktok',icon:'🎵',platTag:'platform-tiktok',reach:'420K',reachN:420000,mention:65,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(139,92,246,.2)',avatarColor:'#a78bfa',spark:[5,6,8,9,11,13,12]},
-  {rank:7,name:'Tempo Online',handle:'@tempodotco',platform:'news',icon:'📰',platTag:'platform-news',reach:'390K',reachN:390000,mention:62,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(249,115,22,.2)',avatarColor:'#fb923c',spark:[6,7,8,9,10,11,9]},
-  {rank:8,name:'ViralPolri ID',handle:'@viralpolri',platform:'tiktok',icon:'🎵',platTag:'platform-tiktok',reach:'360K',reachN:360000,mention:58,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(16,185,129,.2)',avatarColor:'#6ee7b7',spark:[8,9,7,10,12,11,13]},
-  {rank:9,name:'CNN Indonesia',handle:'@cnnid',platform:'news',icon:'📰',platTag:'platform-news',reach:'340K',reachN:340000,mention:54,senti:'neu',sentiLabel:'Netral',avatarBg:'rgba(59,130,246,.15)',avatarColor:'#93c5fd',spark:[5,6,7,8,7,6,8]},
-  {rank:10,name:'WatchPolri Channel',handle:'WatchPolriYT',platform:'yt',icon:'▶️',platTag:'platform-yt',reach:'310K',reachN:310000,mention:48,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(239,68,68,.15)',avatarColor:'#fca5a5',spark:[4,5,6,7,9,8,10]},
-  {rank:11,name:'Humas Polri',handle:'@humaspolri',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'290K',reachN:290000,mention:45,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(6,182,212,.2)',avatarColor:'#67e8f9',spark:[10,11,9,12,13,14,15]},
-  {rank:12,name:'PolisiTV',handle:'PoliceTVIndo',platform:'yt',icon:'▶️',platTag:'platform-yt',reach:'260K',reachN:260000,mention:41,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(245,158,11,.2)',avatarColor:'#fde68a',spark:[6,7,8,9,8,10,11]},
-];
-
-// DATA DIPERBARUI: 5 MARET 2026 — Isu 24 Jam Terakhir
-let isuData = [
-  {title:'Penembakan Warga Bertrand oleh Oknum IPTU di Makassar',senti:'neg',mention:5240,spike:420,desc:'Oknum IPTU dari Polsek Panakkukang diduga menembak warga Bertrand di Jalan Toddopuli Raya, Makassar, Minggu 1 Maret 2026 pukul 07.20 WITA. LBH Makassar mengecam keras dan mendesak Polri lakukan reformasi struktural. Isu kian viral menjelang akhir pekan.',platform:'Twitter, Repelita.com, LBH Makassar',emoji:'🔴',source:'repelita.com',url:'https://www.repelita.com/2026/03/lbh-makassar-kecam-penembakan-bertrand.html'},
-  {title:'Kakorlantas: Operasi Ketupat 2026 adalah Operasi Kemanusiaan',senti:'pos',mention:3960,spike:180,desc:'Kakorlantas Polri Irjen Agus Suryonugroho menegaskan Operasi Ketupat 2026 bukan sekadar pengamanan lalu lintas, melainkan bentuk kehadiran negara. Gelar pasukan dijadwalkan 12 Maret, operasi 13–26 Maret 2026 dengan tagline "Mudik Aman Keluarga Bahagia".',platform:'Korlantas Polri, Media Online, Twitter',emoji:'🚓',source:'korlantas.polri.go.id',url:'https://korlantas.polri.go.id/2026-03-04-operasi-ketupat-2026-adalah-operasi-kemanusiaan-kakorlantas-utamakan-keselamatan/'},
-  {title:'Viral Mahasiswa Bentak & Coret Jilbab Polwan saat Demo Mabes Polri',senti:'neg',mention:3710,spike:290,desc:'Video viral mahasiswa beralmamater membentak polisi dan mencoret kain jilbab Polwan saat demonstrasi di depan Mabes Polri, 27 Feb 2026. PNJ resmi meminta maaf. Polda Metro: aspirasi mahasiswa jadi bahan evaluasi. Demo menuntut hukuman berat oknum Brimob pelaku penganiayaan siswa di Tual, Maluku.',platform:'Twitter, Liputan6, Detik, TikTok',emoji:'📢',source:'liputan6.com',url:'https://www.liputan6.com/news/read/6289183/viral-mahasiswa-bentak-polisi-saat-demo-di-mabes-polri-pnj-minta-maaf-dan-lakukan-pendisiplinan'},
-  {title:'Aliansi Reformasi Polri (AROMI) Demo di Berbagai Kota',senti:'neg',mention:2840,spike:210,desc:'Mahasiswa tergabung dalam AROMI menggelar aksi unjuk rasa di Mabes Polri Jakarta dan DPRD Kalteng Palangka Raya. Menuntut penuntasan kasus oknum Brimob di Tual, reformasi rekrutmen, dan penghapusan impunitas di tubuh Polri.',platform:'Twitter, Media Online, TikTok',emoji:'✊',source:'saibumi.id',url:'https://saibumi.id/operasi-ketupat-2026-libatkan-ribuan-posko-pengamanan-dan-pelayanan/'},
-  {title:'Polri Klarifikasi Hoaks Sabu Meleleh 30 Kg Raib',senti:'neu',mention:2290,spike:140,desc:'Divisi Humas Polri pada 3 Maret 2026 menegaskan viral narasi "sabu meleleh akibat panas hingga 30 kg barang bukti raib" adalah hoaks. Polri tidak pernah mengeluarkan keterangan bahwa barang bukti narkotika dapat terurai karena suhu panas.',platform:'Twitter, Hasanah.id, Instagram',emoji:'🚫',source:'hasanah.id',url:'https://hasanah.id/berita/308100/isu-sabu-meleleh-bikin'},
-  {title:'Oknum Polisi Gunakan Motor Barang Bukti untuk Keperluan Pribadi',senti:'neg',mention:1980,spike:95,desc:'Video viral memperlihatkan Bripka SI dari Pos Lantas Kotadalam, Lampung Selatan, menggunakan motor warga yang disita sebagai barang bukti kecelakaan untuk keperluan pribadi. Propam Polres Lampung Selatan langsung memprosesnya secara disiplin.',platform:'Liputan6, Twitter, TikTok',emoji:'⚠️',source:'liputan6.com',url:'https://www.liputan6.com/regional/read/6288967/video-viral-anggota-polisi-pakai-motor-barang-bukti-langsung-diperiksa-propam'},
-  {title:'THR Anggota Polri Dicairkan Bertahap, Naik 10% dari 2025',senti:'pos',mention:1650,spike:30,desc:'Pemerintah mencairkan THR 2026 untuk ASN, TNI, dan Polri secara bertahap sejak 26 Februari 2026. Total anggaran Rp55 triliun, naik 10% atau Rp6 triliun dari tahun sebelumnya. Komponen THR meliputi gaji pokok penuh dan tunjangan kinerja.',platform:'Media Online, Instagram, Twitter',emoji:'💰',source:'romisaputra.com',url:'https://www.romisaputra.com/2026/03/thr-asn-tni-polri-dan-pensiunan-dicairkan-bertahap-mulai-26-februari-2026.html'},
-  {title:'Polres Madiun Bongkar Penipuan Perizinan Dapur MBG, 3 Calo Ditangkap',senti:'pos',mention:1430,spike:85,desc:'Satreskrim Polres Madiun Kota mengungkap sindikat calo perizinan dapur program Makan Bergizi Gratis (MBG). Tiga pelaku ditangkap dengan modus menjanjikan verifikasi resmi Badan Gizi Nasional, merugikan korban ratusan juta rupiah.',platform:'Merdeka.com, Media Online, Twitter',emoji:'🍱',source:'merdeka.com',url:'https://www.merdeka.com'},
-  {title:'Residivis Pakai Kaos "Sat Samapta" Aniaya Wanita Hingga Tewas di Trenggalek',senti:'neg',mention:1280,spike:110,desc:'Video 44 detik viral memperlihatkan pria berkaos "Sat Samapta" Polri menganiaya wanita di Trenggalek. Polres Trenggalek tegaskan pelaku bukan anggota Polri melainkan residivis curanmor. Korban berinisial ED (33) meninggal dunia usai kejadian.',platform:'Twitter, TikTok, Serayu Nusantara',emoji:'🎽',source:'serayunusantara.com',url:'https://serayunusantara.com/polisi-ungkap-kedok-pria-berkaos-samapta-di-trenggalek-ternyata-residivis-bukan-anggota-polri/'},
-  {title:'Sosialisasi Penerimaan Terpadu Polri 2026 Serentak di Seluruh Indonesia',senti:'pos',mention:1120,spike:22,desc:'Jajaran Polres di seluruh Indonesia gencar sosialisasikan Penerimaan Terpadu Calon Anggota Polri 2026 ke sekolah-sekolah. Polri menekankan prinsip BETAH (Bersih, Transparan, Akuntabel, Humanis) untuk mencegah percaloan.',platform:'Tribunpontianak, Media Daerah, Instagram',emoji:'👮',source:'tribunpontianak.co.id',url:'https://pontianak.tribunnews.com/kalbar/1164583/polres-sekadau-sosialisasikan-penerimaan-terpadu-anggota-polri-2026-di-sma-karya'},
-  {title:'Polri Soroti Jam Rawan Kecelakaan Jelang Mudik 2026',senti:'neu',mention:980,spike:20,desc:'Kapolri mengungkap data 532 kejadian kecelakaan pada jam-jam rawan dengan penyebab utama gagal jaga jarak aman (1.156 kasus). Polri akan intensifkan kampanye keselamatan, patroli jam risiko tinggi, dan edukasi publik menjelang Operasi Ketupat.',platform:'Mili.id, Media Online',emoji:'🚗',source:'mili.id',url:'https://mili.id/baca-22526-operasi-ketupat-2026-siap-digelar-polri-soroti-jam-rawan-kecelakaan'},
-  {title:'Mutasi 17 Brigjen & 5 Irjen Polri Akhir Februari 2026',senti:'neu',mention:860,spike:5,desc:'Gelombang mutasi besar Polri akhir Februari 2026 meliputi 17 Brigadir Jenderal dan 5 Irjen Polisi. Termasuk penunjukan Brigjen Yusuf sebagai Wakapolda Kalimantan Utara dan Irjen Daniel Silitonga digeser menjadi Gubernur Akpol.',platform:'SINDOnews, Twitter, Media Online',emoji:'🔄',source:'sindonews.com',url:'https://www.sindonews.com/topic/148831/mutasi-polri'},
-];
-
-// TIMELINE: Update 5 Maret 2026 — 24 Jam Terakhir
-let timelineData = [
-  {time:'09:45',dot:'#ef4444',title:'BREAKING — LBH Makassar Kecam Penembakan Bertrand oleh Oknum IPTU',source:'Repelita.com · 5.240 mention',text:'LBH Makassar mendesak oknum IPTU Polsek Panakkukang segera dinonaktifkan dan diproses pidana. Kasus ini disebut cerminan "kultur kekerasan" di tubuh Polri. Tagar #BertrandMakassar mulai trending.',platforms:['Twitter','TikTok','Repelita.com']},
-  {time:'08:10',dot:'#10b981',title:'UPDATE — Kakorlantas Finalkan Kesiapan Operasi Ketupat 2026',source:'Korlantas Polri · 3.960 mention',text:'Irjen Agus Suryonugroho nyatakan Operasi Ketupat 2026 adalah "operasi kemanusiaan" bukan sekadar lalu lintas. Gelar pasukan 12 Maret, operasi dimulai 13 Maret. Lima klaster pengamanan: tol, arteri, pelabuhan, ibadah, wisata.',platforms:['Media Online','Instagram','Twitter']},
-  {time:'06:30',dot:'#ef4444',title:'VIRAL — Mahasiswa AROMI Gelar Demo di Mabes Polri & DPRD Kalteng',source:'Liputan6 · 3.710 mention',text:'Aliansi Reformasi Polri (AROMI) kembali bergerak. Demo di Mabes Polri dan DPRD Kalimantan Tengah menuntut penuntasan kasus Brimob Tual dan reformasi rekrutmen Polri. Video mahasiswa bentak polisi viral, PNJ resmi minta maaf.',platforms:['Twitter','TikTok','Detik']},
-  {time:'04:55',dot:'#f59e0b',title:'KLARIFIKASI — Polri Bantah Hoaks Sabu 30 Kg Meleleh',source:'Humas Polri · 2.290 mention',text:'Divisi Humas Polri menegaskan narasi viral "sabu meleleh akibat panas hingga 30 kg raib" adalah hoaks. Tidak ada pernyataan resmi Polri tentang barang bukti narkotika yang dapat terurai karena suhu.',platforms:['Instagram','Twitter','Hasanah.id']},
-  {time:'03:15',dot:'#8b5cf6',title:'VIRAL — Video Oknum Bripka Pakai Motor Barang Bukti untuk Pribadi',source:'Liputan6 · 1.980 mention',text:'Bripka SI di Lampung Selatan ketahuan menggunakan motor warga yang disita sebagai barang bukti kecelakaan. Propam Polres Lampung Selatan langsung proses disiplin. Publik pertanyakan pengawasan internal Polri.',platforms:['TikTok','Twitter','Liputan6']},
-  {time:'01:40',dot:'#3b82f6',title:'INFO — THR Polri 2026 Cair, Naik 10% Jadi Rp55 Triliun',source:'Media Online · 1.650 mention',text:'Pemerintah cairkan THR ASN, TNI, dan Polri bertahap sejak 26 Februari. Total Rp55 triliun, naik Rp6 triliun dari tahun lalu. Komponen mencakup gaji pokok penuh dan tunjangan kinerja.',platforms:['Media Online','Instagram']},
-  {time:'00:20',dot:'#06b6d4',title:'SISTEM — Closing Report 04 Maret 2026',source:'SIGAP Auto · Internal',text:'Laporan penutupan harian otomatis. Total 46.390 mention kemarin dengan sentimen 35% positif, 27% netral, 38% negatif. Isu kekerasan oknum mendominasi percakapan.',platforms:['Internal']},
-];
-
-let sentiTableData = [
-  {isu:'Penembakan Bertrand — Oknum IPTU Makassar',mention:5240,pos:5,neu:14,neg:81,dom:'neg',trend:'up'},
-  {isu:'Operasi Ketupat 2026 — Persiapan Mudik',mention:3960,pos:72,neu:20,neg:8,dom:'pos',trend:'up'},
-  {isu:'Demo AROMI — Bentak Polisi Mabes Polri',mention:3710,pos:8,neu:18,neg:74,dom:'neg',trend:'up'},
-  {isu:'Hoaks Sabu Meleleh — Klarifikasi Polri',mention:2290,pos:38,neu:45,neg:17,dom:'neu',trend:'flat'},
-  {isu:'Bripka Pakai Motor Barang Bukti',mention:1980,pos:7,neu:20,neg:73,dom:'neg',trend:'up'},
-  {isu:'THR Polri 2026 Naik 10%',mention:1650,pos:76,neu:18,neg:6,dom:'pos',trend:'up'},
-  {isu:'Penipuan Dapur MBG — 3 Calo Ditangkap',mention:1430,pos:68,neu:22,neg:10,dom:'pos',trend:'up'},
-  {isu:'Residivis Kaos Samapta Aniaya Wanita Trenggalek',mention:1280,pos:12,neu:25,neg:63,dom:'neg',trend:'up'},
-];
-
-let reportHistoryData = [
-  {icon:'🚨',title:'Alert Report — Penembakan Bertrand Makassar',date:'05 Mar 2026 · 09:45 WIB',size:'0.8 MB'},
-  {icon:'📋',title:'Laporan Harian — 05 Mar 2026',date:'05 Mar 2026 · 08:00 WIB',size:'2.9 MB'},
-  {icon:'📋',title:'Laporan Harian — 04 Mar 2026',date:'04 Mar 2026 · 08:00 WIB',size:'2.6 MB'},
-  {icon:'🚨',title:'Alert Report — Demo AROMI Mabes Polri',date:'03 Mar 2026 · 07:00 WIB',size:'0.7 MB'},
-  {icon:'📋',title:'Laporan Harian — 03 Mar 2026',date:'03 Mar 2026 · 08:00 WIB',size:'2.4 MB'},
-  {icon:'📊',title:'Laporan Mingguan — W9 2026',date:'03 Mar 2026 · 09:00 WIB',size:'6.1 MB'},
-  {icon:'📈',title:'Laporan Bulanan — Februari 2026',date:'01 Mar 2026 · 08:00 WIB',size:'13.1 MB'},
-];
-
+// ===================== DATA (loaded from data.json) =====================
+let influencerData = [];
+let isuData        = [];
+let timelineData   = [];
+let sentiTableData = [];
+let reportHistoryData = [];
 
 // ===================== JSON DATA PERSISTENCE =====================
+const DATA_FILE   = 'data.json';   // path relatif di folder yang sama
 const STORAGE_KEY = 'sigap_data_v1';
 
-function saveDataToStorage(scanData, source='manual'){
-  const payload = {
-    savedAt: new Date().toISOString(),
-    savedAtLocal: new Date().toLocaleString('id-ID', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-    source: source,
-    version: '3.0',
+// Buat payload JSON dari data aktif saat ini
+function buildPayload(scanData, source){
+  return {
+    meta: {
+      version: '3.0',
+      savedAt: new Date().toISOString(),
+      savedAtLocal: new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+      source: source || 'Manual'
+    },
     kpi: {
       totalMention: document.getElementById('kpiMention')?.textContent || '—',
-      sentiPos: document.getElementById('kpiPos')?.textContent || '—',
-      sentiNeg: document.getElementById('kpiNeg')?.textContent || '—',
-      viralCount: document.getElementById('kpiViral')?.textContent || '—',
+      sentiPos:     document.getElementById('kpiPos')?.textContent     || '—',
+      sentiNeg:     document.getElementById('kpiNeg')?.textContent     || '—',
+      viralCount:   document.getElementById('kpiViral')?.textContent   || '—',
     },
-    isuData: isuData,
-    timelineData: timelineData,
-    sentiTableData: sentiTableData,
-    reportHistoryData: reportHistoryData,
-    aiScanResult: scanData || null,
+    influencerData,
+    isuData,
+    timelineData,
+    sentiTableData,
+    reportHistoryData,
+    aiScanResult: scanData || null
   };
+}
+
+// Tulis data ke in-memory arrays dari payload JSON
+function applyPayload(payload){
+  if(!payload) return;
+  const set = (arr, src) => { if(src?.length){ arr.splice(0, arr.length, ...src); } };
+  set(influencerData,    payload.influencerData);
+  set(isuData,           payload.isuData);
+  set(timelineData,      payload.timelineData);
+  set(sentiTableData,    payload.sentiTableData);
+  set(reportHistoryData, payload.reportHistoryData);
+  if(payload.aiScanResult) lastScanData = payload.aiScanResult;
+  if(payload.kpi){
+    const k = payload.kpi;
+    ['kpiMention','kpiPos','kpiNeg','kpiViral'].forEach((id,i)=>{
+      const el = document.getElementById(id);
+      if(el) el.textContent = [k.totalMention, k.sentiPos, k.sentiNeg, k.viralCount][i];
+    });
+  }
+}
+
+// Simpan ke localStorage (cache browser)
+function saveToLocalStorage(payload){
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    console.log('[SIGAP] Data saved to localStorage at', payload.savedAtLocal);
-    updateStorageStatus(payload.savedAtLocal, source);
-    return payload;
-  } catch(e) {
-    console.error('[SIGAP] Failed to save data:', e);
-    return null;
-  }
+    console.log('[SIGAP] Saved to localStorage:', payload.meta.savedAtLocal);
+  } catch(e){ console.error('[SIGAP] localStorage write failed:', e); }
 }
 
-function loadDataFromStorage(){
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return null;
-    const payload = JSON.parse(raw);
-    if(payload.isuData?.length)        isuData.splice(0, isuData.length, ...payload.isuData);
-    if(payload.timelineData?.length)   timelineData.splice(0, timelineData.length, ...payload.timelineData);
-    if(payload.sentiTableData?.length) sentiTableData.splice(0, sentiTableData.length, ...payload.sentiTableData);
-    if(payload.reportHistoryData?.length) reportHistoryData.splice(0, reportHistoryData.length, ...payload.reportHistoryData);
-    if(payload.aiScanResult)           lastScanData = payload.aiScanResult;
-    console.log('[SIGAP] Data loaded from localStorage, saved at', payload.savedAtLocal);
-    return payload;
-  } catch(e) {
-    console.error('[SIGAP] Failed to load data:', e);
-    return null;
-  }
-}
-
-function downloadDataAsJson(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(!raw){
-    showNotif('⚠️ Belum Ada Data', 'Lakukan Pindai AI dulu sebelum download JSON.');
-    return;
-  }
-  const payload = JSON.parse(raw);
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const dateStr = new Date().toISOString().slice(0,10);
-  a.href = url;
-  a.download = `sigap-data-${dateStr}.json`;
+// Rewrite data.json: download file baru + update localStorage
+function rewriteDataJson(scanData, source){
+  const payload = buildPayload(scanData, source);
+  // 1. Simpan ke localStorage sebagai cache real-time
+  saveToLocalStorage(payload);
+  // 2. Download data.json baru — user upload ke GitHub agar permanen
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'data.json';   // selalu nama yang sama agar replace di GitHub
   a.click();
   URL.revokeObjectURL(url);
-  showNotif('📥 JSON Didownload', `sigap-data-${dateStr}.json berhasil diunduh.`);
+  // 3. Update status bar
+  setStorageStatus(`💾 ${payload.meta.savedAtLocal} — data.json diperbarui (upload ke GitHub)`,'cyan');
+  // 4. Tampilkan banner instruksi
+  showUpdateBanner(payload.meta.savedAtLocal);
+  return payload;
+}
+
+// Download salinan dengan nama tanggal (untuk arsip)
+function downloadDataAsJson(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw){ showNotif('⚠️ Belum Ada Data','Lakukan Pindai AI dulu.'); return; }
+  const payload = JSON.parse(raw);
+  const blob = new Blob([JSON.stringify(payload, null, 2)],{type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `sigap-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showNotif('📥 Backup Diunduh','File backup JSON berhasil diunduh.');
 }
 
 function clearStoredData(){
-  if(!confirm('Hapus semua data tersimpan? Dashboard akan kembali ke data default.')) return;
+  if(!confirm('Hapus cache browser? Dashboard akan muat ulang dari data.json.')) return;
   localStorage.removeItem(STORAGE_KEY);
   location.reload();
 }
 
-function updateStorageStatus(timeStr, source){
+function setStorageStatus(text, color='default'){
   const el = document.getElementById('storageStatusText');
-  if(el) el.textContent = `💾 Tersimpan: ${timeStr} (${source})`;
+  if(!el) return;
+  el.textContent = text;
+  el.style.color = color==='cyan'?'rgba(6,182,212,0.85)':color==='green'?'rgba(16,185,129,0.85)':'var(--muted)';
+}
+
+function showUpdateBanner(timeStr){
+  // Hapus banner lama kalau ada
+  const old = document.getElementById('updateBanner');
+  if(old) old.remove();
+  const banner = document.createElement('div');
+  banner.id = 'updateBanner';
+  banner.style.cssText = `position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:9999;
+    background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(139,92,246,0.12));
+    border:1px solid rgba(6,182,212,0.4);border-radius:12px;padding:14px 20px;
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#e2eaf8;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:520px;text-align:center;`;
+  banner.innerHTML = `<strong style="color:#22d3ee;">📥 data.json baru telah didownload!</strong><br>
+    <span style="color:var(--muted)">Upload file <code style="background:rgba(255,255,255,0.1);padding:1px 6px;border-radius:4px;">data.json</code> ke GitHub repo Anda untuk menyimpan data secara permanen.</span><br><br>
+    <span style="color:rgba(245,158,11,0.8);font-size:11px;">⏱ ${timeStr} · Data aktif di browser sudah diperbarui</span>
+    <button onclick="document.getElementById('updateBanner').remove()" style="margin-left:16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+      border-radius:6px;padding:4px 10px;color:#94a3b8;cursor:pointer;font-size:11px;">✕ Tutup</button>`;
+  document.body.appendChild(banner);
+  setTimeout(()=>{ if(banner.parentNode) banner.remove(); }, 15000);
 }
 
 
@@ -1058,22 +1045,47 @@ function updateStorageStatus(timeStr, source){
 document.addEventListener('DOMContentLoaded', ()=>{
   updateTime();
   setInterval(updateTime, 30000);
+  initApiKeyUI();
 
-  // Load saved data from localStorage before rendering
-  const savedPayload = loadDataFromStorage();
-  if(savedPayload){
-    const el = document.getElementById('storageStatusText');
-    if(el) el.textContent = `💾 Data dimuat: ${savedPayload.savedAtLocal} (${savedPayload.source})`;
-    // Restore KPI from saved
-    if(savedPayload.kpi){
-      const k = savedPayload.kpi;
-      if(document.getElementById('kpiMention')) document.getElementById('kpiMention').textContent = k.totalMention;
-      if(document.getElementById('kpiPos'))     document.getElementById('kpiPos').textContent = k.sentiPos;
-      if(document.getElementById('kpiNeg'))     document.getElementById('kpiNeg').textContent = k.sentiNeg;
-      if(document.getElementById('kpiViral'))   document.getElementById('kpiViral').textContent = k.viralCount;
-    }
-  }
+  // 1. Cek apakah ada cache di localStorage yang lebih baru dari data.json
+  const cached = localStorage.getItem(STORAGE_KEY);
+  const cachedPayload = cached ? JSON.parse(cached) : null;
 
+  // 2. Selalu fetch data.json sebagai sumber utama
+  fetch(DATA_FILE + '?v=' + Date.now())
+    .then(r => r.ok ? r.json() : Promise.reject('fetch-fail'))
+    .then(fileData => {
+      // Bandingkan timestamp: pakai yang lebih baru
+      const fileTime  = fileData.meta?.savedAt  ? new Date(fileData.meta.savedAt).getTime()  : 0;
+      const cacheTime = cachedPayload?.meta?.savedAt ? new Date(cachedPayload.meta.savedAt).getTime() : 0;
+
+      if(cacheTime > fileTime){
+        // Cache browser lebih baru dari data.json di GitHub → gunakan cache
+        applyPayload(cachedPayload);
+        setStorageStatus(`💾 Cache browser: ${cachedPayload.meta.savedAtLocal} (lebih baru dari data.json)`,'cyan');
+        console.log('[SIGAP] Using localStorage cache (newer than data.json)');
+      } else {
+        // data.json lebih baru atau sama → gunakan data.json & perbarui cache
+        applyPayload(fileData);
+        saveToLocalStorage(fileData);
+        setStorageStatus(`✅ data.json dimuat: ${fileData.meta?.savedAtLocal || '—'}`,'green');
+        console.log('[SIGAP] Using data.json (source of truth)');
+      }
+      renderAll();
+    })
+    .catch(err => {
+      console.warn('[SIGAP] data.json not found, trying localStorage cache...', err);
+      if(cachedPayload){
+        applyPayload(cachedPayload);
+        setStorageStatus(`⚠️ data.json tidak ditemukan — menggunakan cache: ${cachedPayload.meta.savedAtLocal}`,'');
+      } else {
+        setStorageStatus('⚠️ Tidak ada data.json & cache. Pindai AI untuk memulai.','');
+      }
+      renderAll();
+    });
+});
+
+function renderAll(){
   renderOverviewTopics();
   renderOverviewInfluencers();
   buildHeatmap();
@@ -1089,8 +1101,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   initInfluencerCharts();
   initLaporanChart();
   triggerBarAnimation();
-  initApiKeyUI();
-});
+}
 
 function updateTime(){
   const now = new Date();
@@ -1670,7 +1681,7 @@ Pastikan issues memiliki setidaknya 8-10 item, diurutkan dari yang paling banyak
       });
       sentiTableData.splice(0, sentiTableData.length, ...newSenti);
     }
-    saveDataToStorage(scanData, 'AI Scan');
+    rewriteDataJson(scanData, 'AI Scan — ' + new Date().toLocaleDateString('id-ID'));
 
     // Update timestamp
     const ts = now.toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
