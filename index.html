@@ -896,9 +896,13 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:14
 </main>
 
 <footer>
-  <div class="footer-left">SIGAP v3.0 · © 2026 Divisi Humas Polri · Dokumen bersifat RAHASIA INTERNAL · AI-Powered by Claude · Diperbarui otomatis setiap hari</div>
+  <div class="footer-left">
+    SIGAP v3.0 · © 2026 Divisi Humas Polri · RAHASIA INTERNAL · AI-Powered by Claude
+    <span id="storageStatusText" style="margin-left:14px;color:rgba(6,182,212,0.7);">💾 Belum ada data tersimpan</span>
+  </div>
   <div class="footer-right">
-    <button class="btn btn-ghost" onclick="showNotif('Export Excel','Fitur export akan tersedia di versi live dengan koneksi API.')">📊 Export Excel</button>
+    <button class="btn btn-ghost" onclick="downloadDataAsJson()">📥 Download JSON</button>
+    <button class="btn btn-ghost" onclick="clearStoredData()" title="Hapus data tersimpan">🗑 Reset Data</button>
     <button class="btn btn-ghost" onclick="copyReportToClipboard()">📋 Salin Laporan</button>
     <button class="btn btn-primary" onclick="printReport()">📄 Unduh Laporan PDF</button>
   </div>
@@ -922,7 +926,7 @@ const influencerData = [
 ];
 
 // DATA DIPERBARUI: 5 MARET 2026 — Isu 24 Jam Terakhir
-const isuData = [
+let isuData = [
   {title:'Penembakan Warga Bertrand oleh Oknum IPTU di Makassar',senti:'neg',mention:5240,spike:420,desc:'Oknum IPTU dari Polsek Panakkukang diduga menembak warga Bertrand di Jalan Toddopuli Raya, Makassar, Minggu 1 Maret 2026 pukul 07.20 WITA. LBH Makassar mengecam keras dan mendesak Polri lakukan reformasi struktural. Isu kian viral menjelang akhir pekan.',platform:'Twitter, Repelita.com, LBH Makassar',emoji:'🔴',source:'repelita.com',url:'https://www.repelita.com/2026/03/lbh-makassar-kecam-penembakan-bertrand.html'},
   {title:'Kakorlantas: Operasi Ketupat 2026 adalah Operasi Kemanusiaan',senti:'pos',mention:3960,spike:180,desc:'Kakorlantas Polri Irjen Agus Suryonugroho menegaskan Operasi Ketupat 2026 bukan sekadar pengamanan lalu lintas, melainkan bentuk kehadiran negara. Gelar pasukan dijadwalkan 12 Maret, operasi 13–26 Maret 2026 dengan tagline "Mudik Aman Keluarga Bahagia".',platform:'Korlantas Polri, Media Online, Twitter',emoji:'🚓',source:'korlantas.polri.go.id',url:'https://korlantas.polri.go.id/2026-03-04-operasi-ketupat-2026-adalah-operasi-kemanusiaan-kakorlantas-utamakan-keselamatan/'},
   {title:'Viral Mahasiswa Bentak & Coret Jilbab Polwan saat Demo Mabes Polri',senti:'neg',mention:3710,spike:290,desc:'Video viral mahasiswa beralmamater membentak polisi dan mencoret kain jilbab Polwan saat demonstrasi di depan Mabes Polri, 27 Feb 2026. PNJ resmi meminta maaf. Polda Metro: aspirasi mahasiswa jadi bahan evaluasi. Demo menuntut hukuman berat oknum Brimob pelaku penganiayaan siswa di Tual, Maluku.',platform:'Twitter, Liputan6, Detik, TikTok',emoji:'📢',source:'liputan6.com',url:'https://www.liputan6.com/news/read/6289183/viral-mahasiswa-bentak-polisi-saat-demo-di-mabes-polri-pnj-minta-maaf-dan-lakukan-pendisiplinan'},
@@ -938,7 +942,7 @@ const isuData = [
 ];
 
 // TIMELINE: Update 5 Maret 2026 — 24 Jam Terakhir
-const timelineData = [
+let timelineData = [
   {time:'09:45',dot:'#ef4444',title:'BREAKING — LBH Makassar Kecam Penembakan Bertrand oleh Oknum IPTU',source:'Repelita.com · 5.240 mention',text:'LBH Makassar mendesak oknum IPTU Polsek Panakkukang segera dinonaktifkan dan diproses pidana. Kasus ini disebut cerminan "kultur kekerasan" di tubuh Polri. Tagar #BertrandMakassar mulai trending.',platforms:['Twitter','TikTok','Repelita.com']},
   {time:'08:10',dot:'#10b981',title:'UPDATE — Kakorlantas Finalkan Kesiapan Operasi Ketupat 2026',source:'Korlantas Polri · 3.960 mention',text:'Irjen Agus Suryonugroho nyatakan Operasi Ketupat 2026 adalah "operasi kemanusiaan" bukan sekadar lalu lintas. Gelar pasukan 12 Maret, operasi dimulai 13 Maret. Lima klaster pengamanan: tol, arteri, pelabuhan, ibadah, wisata.',platforms:['Media Online','Instagram','Twitter']},
   {time:'06:30',dot:'#ef4444',title:'VIRAL — Mahasiswa AROMI Gelar Demo di Mabes Polri & DPRD Kalteng',source:'Liputan6 · 3.710 mention',text:'Aliansi Reformasi Polri (AROMI) kembali bergerak. Demo di Mabes Polri dan DPRD Kalimantan Tengah menuntut penuntasan kasus Brimob Tual dan reformasi rekrutmen Polri. Video mahasiswa bentak polisi viral, PNJ resmi minta maaf.',platforms:['Twitter','TikTok','Detik']},
@@ -948,7 +952,7 @@ const timelineData = [
   {time:'00:20',dot:'#06b6d4',title:'SISTEM — Closing Report 04 Maret 2026',source:'SIGAP Auto · Internal',text:'Laporan penutupan harian otomatis. Total 46.390 mention kemarin dengan sentimen 35% positif, 27% netral, 38% negatif. Isu kekerasan oknum mendominasi percakapan.',platforms:['Internal']},
 ];
 
-const sentiTableData = [
+let sentiTableData = [
   {isu:'Penembakan Bertrand — Oknum IPTU Makassar',mention:5240,pos:5,neu:14,neg:81,dom:'neg',trend:'up'},
   {isu:'Operasi Ketupat 2026 — Persiapan Mudik',mention:3960,pos:72,neu:20,neg:8,dom:'pos',trend:'up'},
   {isu:'Demo AROMI — Bentak Polisi Mabes Polri',mention:3710,pos:8,neu:18,neg:74,dom:'neg',trend:'up'},
@@ -959,7 +963,7 @@ const sentiTableData = [
   {isu:'Residivis Kaos Samapta Aniaya Wanita Trenggalek',mention:1280,pos:12,neu:25,neg:63,dom:'neg',trend:'up'},
 ];
 
-const reportHistoryData = [
+let reportHistoryData = [
   {icon:'🚨',title:'Alert Report — Penembakan Bertrand Makassar',date:'05 Mar 2026 · 09:45 WIB',size:'0.8 MB'},
   {icon:'📋',title:'Laporan Harian — 05 Mar 2026',date:'05 Mar 2026 · 08:00 WIB',size:'2.9 MB'},
   {icon:'📋',title:'Laporan Harian — 04 Mar 2026',date:'04 Mar 2026 · 08:00 WIB',size:'2.6 MB'},
@@ -969,10 +973,107 @@ const reportHistoryData = [
   {icon:'📈',title:'Laporan Bulanan — Februari 2026',date:'01 Mar 2026 · 08:00 WIB',size:'13.1 MB'},
 ];
 
+
+// ===================== JSON DATA PERSISTENCE =====================
+const STORAGE_KEY = 'sigap_data_v1';
+
+function saveDataToStorage(scanData, source='manual'){
+  const payload = {
+    savedAt: new Date().toISOString(),
+    savedAtLocal: new Date().toLocaleString('id-ID', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    source: source,
+    version: '3.0',
+    kpi: {
+      totalMention: document.getElementById('kpiMention')?.textContent || '—',
+      sentiPos: document.getElementById('kpiPos')?.textContent || '—',
+      sentiNeg: document.getElementById('kpiNeg')?.textContent || '—',
+      viralCount: document.getElementById('kpiViral')?.textContent || '—',
+    },
+    isuData: isuData,
+    timelineData: timelineData,
+    sentiTableData: sentiTableData,
+    reportHistoryData: reportHistoryData,
+    aiScanResult: scanData || null,
+  };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    console.log('[SIGAP] Data saved to localStorage at', payload.savedAtLocal);
+    updateStorageStatus(payload.savedAtLocal, source);
+    return payload;
+  } catch(e) {
+    console.error('[SIGAP] Failed to save data:', e);
+    return null;
+  }
+}
+
+function loadDataFromStorage(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    const payload = JSON.parse(raw);
+    if(payload.isuData?.length)        isuData.splice(0, isuData.length, ...payload.isuData);
+    if(payload.timelineData?.length)   timelineData.splice(0, timelineData.length, ...payload.timelineData);
+    if(payload.sentiTableData?.length) sentiTableData.splice(0, sentiTableData.length, ...payload.sentiTableData);
+    if(payload.reportHistoryData?.length) reportHistoryData.splice(0, reportHistoryData.length, ...payload.reportHistoryData);
+    if(payload.aiScanResult)           lastScanData = payload.aiScanResult;
+    console.log('[SIGAP] Data loaded from localStorage, saved at', payload.savedAtLocal);
+    return payload;
+  } catch(e) {
+    console.error('[SIGAP] Failed to load data:', e);
+    return null;
+  }
+}
+
+function downloadDataAsJson(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw){
+    showNotif('⚠️ Belum Ada Data', 'Lakukan Pindai AI dulu sebelum download JSON.');
+    return;
+  }
+  const payload = JSON.parse(raw);
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `sigap-data-${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showNotif('📥 JSON Didownload', `sigap-data-${dateStr}.json berhasil diunduh.`);
+}
+
+function clearStoredData(){
+  if(!confirm('Hapus semua data tersimpan? Dashboard akan kembali ke data default.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+function updateStorageStatus(timeStr, source){
+  const el = document.getElementById('storageStatusText');
+  if(el) el.textContent = `💾 Tersimpan: ${timeStr} (${source})`;
+}
+
+
 // ===================== INIT =====================
 document.addEventListener('DOMContentLoaded', ()=>{
   updateTime();
   setInterval(updateTime, 30000);
+
+  // Load saved data from localStorage before rendering
+  const savedPayload = loadDataFromStorage();
+  if(savedPayload){
+    const el = document.getElementById('storageStatusText');
+    if(el) el.textContent = `💾 Data dimuat: ${savedPayload.savedAtLocal} (${savedPayload.source})`;
+    // Restore KPI from saved
+    if(savedPayload.kpi){
+      const k = savedPayload.kpi;
+      if(document.getElementById('kpiMention')) document.getElementById('kpiMention').textContent = k.totalMention;
+      if(document.getElementById('kpiPos'))     document.getElementById('kpiPos').textContent = k.sentiPos;
+      if(document.getElementById('kpiNeg'))     document.getElementById('kpiNeg').textContent = k.sentiNeg;
+      if(document.getElementById('kpiViral'))   document.getElementById('kpiViral').textContent = k.viralCount;
+    }
+  }
+
   renderOverviewTopics();
   renderOverviewInfluencers();
   buildHeatmap();
@@ -1539,6 +1640,37 @@ Pastikan issues memiliki setidaknya 8-10 item, diurutkan dari yang paling banyak
     // Update UI with AI results
     renderAiResults(scanData, now);
     updateKPIFromScan(scanData);
+
+    // AUTO-SAVE: update isuData and save to localStorage
+    if(scanData.issues?.length){
+      isuData.splice(0, isuData.length, ...scanData.issues.map(i=>({
+        title: i.title,
+        senti: i.sentiment || i.senti || 'neu',
+        mention: i.mentionEstimate || 0,
+        spike: i.spike || 0,
+        desc: i.summary || i.desc || '',
+        platform: (i.platforms||[]).join(', ') || i.platform || '—',
+        emoji: i.emoji || '📊',
+        source: i.source || '',
+        url: i.url || ''
+      })));
+      const newTimeline = scanData.issues.slice(0,5).map((i,idx)=>({
+        time: i.time || `0${8-idx}:00`,
+        dot: i.sentiment==='neg'||i.senti==='neg'?'#ef4444':i.sentiment==='pos'||i.senti==='pos'?'#10b981':'#f59e0b',
+        title: `${i.sentiment==='neg'||i.senti==='neg'?'ALERT':'UPDATE'} — ${i.title}`,
+        source: `${i.source||'Media Online'} · ${(i.mentionEstimate||0).toLocaleString()} mention`,
+        text: i.summary || i.desc || '',
+        platforms: i.platforms || []
+      }));
+      timelineData.splice(0, timelineData.length, ...newTimeline);
+      const newSenti = scanData.issues.slice(0,8).map(i=>{
+        const pos = i.sentiment==='pos'||i.senti==='pos'?70:i.sentiment==='neg'||i.senti==='neg'?8:35;
+        const neg = i.sentiment==='neg'||i.senti==='neg'?72:i.sentiment==='pos'||i.senti==='pos'?6:22;
+        return {isu:i.title,mention:i.mentionEstimate||0,pos,neu:100-pos-neg,neg,dom:i.sentiment||i.senti||'neu',trend:'up'};
+      });
+      sentiTableData.splice(0, sentiTableData.length, ...newSenti);
+    }
+    saveDataToStorage(scanData, 'AI Scan');
 
     // Update timestamp
     const ts = now.toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
