@@ -817,6 +817,33 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:14
     </div>
   </div>
 
+  <!-- API KEY CONFIG -->
+  <div class="card" id="apiKeyCard" style="border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.04);">
+    <div class="card-header">
+      <div class="card-title" style="color:#c4b5fd;">🔐 Konfigurasi API Key</div>
+      <div id="apiKeyStatus" style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);">Belum dikonfigurasi</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:4px;">
+      <input type="password" id="apiKeyInput" placeholder="Tempel API Key Anda di sini: sk-ant-api03-xxxx..."
+        style="flex:1;background:var(--surface2);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:10px 14px;color:#e2eaf8;font-family:'DM Mono',monospace;font-size:12px;outline:none;transition:border .2s;"
+        onfocus="this.style.borderColor='rgba(139,92,246,0.7)'" onblur="this.style.borderColor='rgba(139,92,246,0.3)'"
+        oninput="toggleApiKeyEye()" />
+      <button onclick="toggleShowKey()" id="showKeyBtn" title="Lihat/sembunyikan"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--muted);cursor:pointer;font-size:13px;transition:all .2s;"
+        onmouseover="this.style.borderColor='rgba(139,92,246,0.5)'" onmouseout="this.style.borderColor='var(--border)'">👁</button>
+      <button onclick="saveApiKey()"
+        style="background:linear-gradient(135deg,rgba(139,92,246,0.4),rgba(59,130,246,0.3));border:1px solid rgba(139,92,246,0.5);border-radius:8px;padding:10px 18px;color:#c4b5fd;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;"
+        onmouseover="this.style.boxShadow='0 0 16px rgba(139,92,246,0.4)'" onmouseout="this.style.boxShadow='none'">
+        💾 Simpan Key
+      </button>
+      <button onclick="clearApiKey()" id="clearKeyBtn" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 13px;color:#f87171;cursor:pointer;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">Hapus</button>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.7;">
+      💡 Dapatkan API key di <strong style="color:#c4b5fd;">console.anthropic.com</strong> → API Keys → Create Key.
+      Key disimpan hanya di browser Anda (localStorage) — tidak dikirim ke server lain.
+    </div>
+  </div>
+
   <!-- KEYWORD CONFIG -->
   <div class="card">
     <div class="card-header"><div class="card-title">🔑 Keyword Pemantauan</div><div class="card-action" onclick="showNotif('Edit Keyword','Fitur edit keyword akan tersedia segera.')">+ Tambah keyword</div></div>
@@ -961,11 +988,61 @@ document.addEventListener('DOMContentLoaded', ()=>{
   initInfluencerCharts();
   initLaporanChart();
   triggerBarAnimation();
+  initApiKeyUI();
 });
 
 function updateTime(){
   const now = new Date();
   document.getElementById('updateTime').textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) + ' WIB';
+}
+
+
+// ===================== API KEY MANAGEMENT =====================
+function initApiKeyUI(){
+  const saved = localStorage.getItem('sigap_api_key');
+  if(saved){ document.getElementById('apiKeyInput').value = saved; setApiKeyStatus(true); }
+}
+function saveApiKey(){
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if(!val){ showNotif('API Key','Masukkan API key terlebih dahulu.'); return; }
+  if(!val.startsWith('sk-ant-')){ showNotif('Format Salah','API key harus diawali dengan sk-ant-...'); return; }
+  localStorage.setItem('sigap_api_key', val);
+  setApiKeyStatus(true);
+  showNotif('✅ API Key Tersimpan','Fitur Pindai AI sekarang aktif. Klik "Pindai Sekarang"!');
+}
+function clearApiKey(){
+  localStorage.removeItem('sigap_api_key');
+  document.getElementById('apiKeyInput').value = '';
+  setApiKeyStatus(false);
+  showNotif('API Key Dihapus','Masukkan API key baru untuk mengaktifkan AI Scan.');
+}
+function setApiKeyStatus(active){
+  const statusEl = document.getElementById('apiKeyStatus');
+  const clearBtn = document.getElementById('clearKeyBtn');
+  const card = document.getElementById('apiKeyCard');
+  if(active){
+    statusEl.textContent = '✅ API Key Aktif';
+    statusEl.style.color = '#34d399';
+    card.style.borderColor = 'rgba(16,185,129,0.4)';
+    card.style.background = 'rgba(16,185,129,0.04)';
+    clearBtn.style.display = 'block';
+  } else {
+    statusEl.textContent = '⚠️ Belum dikonfigurasi';
+    statusEl.style.color = '#f59e0b';
+    card.style.borderColor = 'rgba(139,92,246,0.3)';
+    card.style.background = 'rgba(139,92,246,0.04)';
+    clearBtn.style.display = 'none';
+  }
+}
+function toggleShowKey(){
+  const input = document.getElementById('apiKeyInput');
+  const btn = document.getElementById('showKeyBtn');
+  if(input.type === 'password'){ input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁'; }
+}
+function toggleApiKeyEye(){
+  const val = document.getElementById('apiKeyInput').value;
+  if(!val) setApiKeyStatus(false);
 }
 
 function switchTab(name, el){
@@ -1408,9 +1485,16 @@ Pastikan issues memiliki setidaknya 8-10 item, diurutkan dari yang paling banyak
     document.getElementById('stepAnalysis').classList.add('active');
     document.getElementById('loadingDetail').textContent = 'AI menganalisis sentimen dan klasifikasi isu...';
 
+    const apiKey = localStorage.getItem('sigap_api_key') || '';
+    if(!apiKey) throw new Error('NO_API_KEY');
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
@@ -1426,7 +1510,10 @@ Pastikan issues memiliki setidaknya 8-10 item, diurutkan dari yang paling banyak
     document.getElementById('stepRender').classList.add('active');
     document.getElementById('loadingDetail').textContent = 'Menyusun dashboard dengan data terbaru...';
 
-    if(!response.ok) throw new Error(`API error: ${response.status}`);
+    if(!response.ok){
+      const errBody = await response.json().catch(()=>({}));
+      throw new Error(`API error: ${response.status} — ${errBody?.error?.message||''}`);
+    }
     const data = await response.json();
 
     // Extract text response
