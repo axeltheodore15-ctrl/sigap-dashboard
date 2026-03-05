@@ -1549,14 +1549,46 @@ Pastikan issues memiliki setidaknya 8-10 item, diurutkan dari yang paling banyak
 
   } catch(err) {
     console.error('AI Scan error:', err);
-    const fallback = generateFallbackData(new Date());
-    lastScanData = fallback;
-    renderAiResults(fallback, new Date());
-    updateKPIFromScan(fallback);
-    const ts2 = new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-    document.getElementById('scanTimestamp').textContent = `⚠️ ${ts2} WIB — Data dari basis pengetahuan AI (offline mode)`;
-    document.getElementById('aiTabCount').textContent = `${fallback.issues.length} Isu`;
-    showNotif('⚠️ Mode Offline', 'Menampilkan data dari basis pengetahuan AI terkini.');
+
+    // NO_API_KEY — handled earlier, but just in case
+    if(err.message === 'NO_API_KEY') {
+      document.getElementById('aiResultsArea').innerHTML = `
+        <div class="ai-empty-state" style="border:1px solid rgba(139,92,246,0.4);background:rgba(139,92,246,0.06);">
+          <div class="ai-empty-icon">🔐</div>
+          <div class="ai-empty-title" style="color:#c4b5fd;">API Key Belum Diisi</div>
+          <div class="ai-empty-desc">Masukkan API key Anthropic di kotak <strong>🔐 Konfigurasi API Key</strong> di atas, lalu klik <strong>💾 Simpan Key</strong>.</div>
+        </div>`;
+      document.getElementById('scanTimestamp').textContent = '⚠️ API Key diperlukan';
+    }
+    // CORS / network / invalid key error — show detail, offer fallback
+    else {
+      const errMsg = err.message || 'Unknown error';
+      let hint = '';
+      if(errMsg.includes('401')) hint = '🔑 API key tidak valid atau sudah kadaluarsa. Periksa kembali key Anda di console.anthropic.com';
+      else if(errMsg.includes('403')) hint = '🚫 Akses ditolak. Pastikan API key punya izin yang benar.';
+      else if(errMsg.includes('429')) hint = '⏳ Terlalu banyak request. Tunggu beberapa menit lalu coba lagi.';
+      else if(errMsg.includes('402')) hint = '💳 Saldo API habis. Top-up di console.anthropic.com → Billing.';
+      else if(errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) hint = '🌐 Tidak bisa terhubung ke API. Periksa koneksi internet Anda.';
+      else hint = `Detail error: ${errMsg}`;
+
+      document.getElementById('aiResultsArea').innerHTML = `
+        <div class="ai-empty-state" style="border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.05);">
+          <div class="ai-empty-icon">⚠️</div>
+          <div class="ai-empty-title" style="color:#f87171;">Scan Gagal — ${errMsg.includes('API error') ? errMsg : 'Koneksi Error'}</div>
+          <div class="ai-empty-desc" style="margin-bottom:16px;">${hint}</div>
+          <button onclick="runAiScan()" style="background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);border-radius:8px;padding:10px 20px;color:#93c5fd;font-weight:600;cursor:pointer;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">🔄 Coba Lagi</button>
+          <span style="margin: 0 12px; color:var(--muted);">atau</span>
+          <button onclick="loadFallback()" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:10px 20px;color:#fbbf24;font-weight:600;cursor:pointer;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">📦 Pakai Data Offline</button>
+        </div>`;
+      document.getElementById('scanTimestamp').textContent = `⚠️ Scan gagal — ${hint.substring(0,60)}...`;
+    }
+    document.getElementById('aiTabCount').textContent = 'Error';
+    mainBtn.disabled = false;
+    mainBtn.classList.remove('loading');
+    mainBtn.textContent = '🔍 Pindai Sekarang';
+    headerBtn.classList.remove('scanning');
+    scanInProgress = false;
+    return;
   }
 
   mainBtn.disabled = false;
@@ -1564,6 +1596,17 @@ Pastikan issues memiliki setidaknya 8-10 item, diurutkan dari yang paling banyak
   mainBtn.textContent = '🔄 Pindai Ulang';
   headerBtn.classList.remove('scanning');
   scanInProgress = false;
+}
+
+function loadFallback(){
+  const fallback = generateFallbackData(new Date());
+  lastScanData = fallback;
+  renderAiResults(fallback, new Date());
+  updateKPIFromScan(fallback);
+  const ts = new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('scanTimestamp').textContent = `📦 ${ts} WIB — Data offline`;
+  document.getElementById('aiTabCount').textContent = `${fallback.issues.length} Isu`;
+  showNotif('📦 Mode Offline', 'Menampilkan data dari basis pengetahuan AI.');
 }
 
 function generateFallbackData(now){
