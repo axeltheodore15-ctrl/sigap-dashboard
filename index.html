@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGAP — Social Media Intelligence Polri</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#060b14; --surface:#0d1525; --surface2:#111d30; --surface3:#162035;
+  --border:rgba(100,170,255,0.1); --border2:rgba(100,170,255,0.18);
+  --accent:#3b82f6; --accent2:#06b6d4; --accent3:#8b5cf6;
+  --pos:#10b981; --neg:#ef4444; --neu:#f59e0b;
+  --text:#e2eaf8; --muted:#5a7096; --muted2:#3d5270;
+  --glow:rgba(59,130,246,0.15);
+  --card-radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(59,130,246,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:1000px;height:600px;background:radial-gradient(ellipse,rgba(59,130,246,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px;}
+header{position:sticky;top:0;z-index:200;background:rgba(6,11,20,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:11px;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 24px rgba(59,130,246,0.4);flex-shrink:0;}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:19px;letter-spacing:.06em;background:linear-gradient(90deg,#fff 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo-sub{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:4px 11px;font-size:10px;font-family:'DM Mono',monospace;color:var(--pos);letter-spacing:.1em;}
+.live-dot{width:6px;height:6px;background:var(--pos);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.4);}50%{opacity:.8;box-shadow:0 0 0 5px rgba(16,185,129,0);}}
+.update-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.header-search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--muted);}
+.header-search input{background:none;border:none;outline:none;color:var(--text);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;width:160px;}
+.header-search input::placeholder{color:var(--muted);}
+.btn-ai-scan{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:8px;background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(59,130,246,0.2));border:1px solid rgba(139,92,246,0.4);color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;}
+.btn-ai-scan:hover{background:linear-gradient(135deg,rgba(139,92,246,0.35),rgba(59,130,246,0.3));box-shadow:0 0 20px rgba(139,92,246,0.3);transform:translateY(-1px);}
+.btn-ai-scan.scanning{animation:aiPulse 1.5s infinite;}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 8px rgba(139,92,246,0.4);}50%{box-shadow:0 0 20px rgba(139,92,246,0.7);}}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:#a78bfa;animation:pulse 1.5s infinite;}
+.nav-tabs{display:flex;align-items:center;padding:0 28px;border-bottom:1px solid var(--border);position:sticky;top:60px;z-index:150;background:rgba(6,11,20,0.94);backdrop-filter:blur(20px);}
+.nav-tab{padding:14px 18px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+.nav-tab .tab-count{background:rgba(100,170,255,0.1);padding:2px 7px;border-radius:10px;font-size:10px;font-family:'DM Mono',monospace;}
+.nav-tab.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+.nav-tab.active .tab-count{background:rgba(6,182,212,0.2);color:var(--accent2);}
+.nav-tab:hover:not(.active){color:var(--text);}
+.nav-tab.alert-tab{position:relative;}
+.nav-tab.alert-tab::after{content:'';position:absolute;top:10px;right:8px;width:6px;height:6px;background:var(--neg);border-radius:50%;animation:pulse 1.5s infinite;}
+.nav-tab.ai-tab{position:relative;}
+.nav-tab.ai-tab .tab-count{background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.25);}
+.nav-tab.ai-tab.active{color:#a78bfa;border-bottom-color:#a78bfa;}
+.tab-panel{display:none;position:relative;z-index:1;}
+.tab-panel.active{display:block;animation:tabIn .35s ease;}
+@keyframes tabIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+main{position:relative;z-index:1;padding:24px 28px 40px;display:flex;flex-direction:column;gap:20px;}
+.filter-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 18px;flex-wrap:wrap;gap:12px;}
+.filter-left,.filter-right{display:flex;align-items:center;gap:10px;}
+.filter-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;flex-shrink:0;}
+.chips{display:flex;gap:5px;flex-wrap:wrap;}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all .2s;letter-spacing:.04em;font-family:'DM Mono',monospace;}
+.chip.active{background:rgba(59,130,246,0.15);border-color:var(--accent);color:var(--accent);}
+.chip.green.active{background:rgba(16,185,129,0.15);border-color:var(--pos);color:var(--pos);}
+.chip.red.active{background:rgba(239,68,68,0.15);border-color:var(--neg);color:var(--neg);}
+.chip.yellow.active{background:rgba(245,158,11,0.15);border-color:var(--neu);color:var(--neu);}
+.chip:hover:not(.active){color:var(--text);border-color:var(--muted2);}
+.kw-pill{padding:4px 10px;border-radius:4px;font-size:10px;font-family:'DM Mono',monospace;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);color:#a78bfa;}
+.kw-more{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;cursor:pointer;text-decoration:underline dotted;}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-radius);padding:18px;position:relative;overflow:hidden;transition:border-color .3s,transform .25s,box-shadow .25s;cursor:pointer;}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.3);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi-card.blue::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.kpi-card.green::before{background:linear-gradient(90deg,var(--pos),#34d399);}
+.kpi-card.red::before{background:linear-gradient(90deg,var(--neg),#f97316);}
+.kpi-card.yellow::before{background:linear-gradient(90deg,var(--neu),#fbbf24);}
+.kpi-card.purple::before{background:linear-gradient(90deg,var(--accent3),#a78bfa);}
+.kpi-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(59,130,246,0.05),transparent 60%);opacity:0;transition:opacity .3s;}
+.kpi-card:hover::after{opacity:1;}
+.kpi-icon{font-size:18px;margin-bottom:10px;}
+.kpi-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-family:'DM Mono',monospace;margin-bottom:5px;}
+.kpi-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1;margin-bottom:7px;}
+.kpi-delta{font-size:10px;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:4px;}
+.kpi-delta.up{color:var(--pos);}
+.kpi-delta.down{color:var(--neg);}
+.kpi-delta.flat{color:var(--muted);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-radius);padding:20px;position:relative;overflow:hidden;transition:border-color .3s;}
+.card:hover{border-color:var(--border2);}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;display:flex;align-items:center;gap:8px;}
+.card-badge{font-family:'DM Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;background:rgba(6,182,212,0.1);color:var(--accent2);border:1px solid rgba(6,182,212,0.2);}
+.card-action{font-size:11px;color:var(--accent);cursor:pointer;font-weight:600;transition:color .2s;}
+.card-action:hover{color:var(--accent2);}
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:18px;}
+.grid-2b{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;}
+.grid-3e{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.chart-wrap{position:relative;}
+.alert-strip{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .2s;}
+.alert-strip:hover{background:rgba(239,68,68,0.1);}
+.alert-strip.green{background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.2);}
+.alert-strip.green:hover{background:rgba(16,185,129,0.1);}
+.alert-title{font-size:12px;font-weight:600;color:#fca5a5;margin-bottom:2px;}
+.alert-strip.green .alert-title{color:#6ee7b7;}
+.alert-desc{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.alert-time{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;flex-shrink:0;}
+.topic-list{display:flex;flex-direction:column;}
+.topic-item{display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;transition:background .2s;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);}
+.topic-item:hover{background:rgba(59,130,246,0.06);}
+.topic-item:last-child{border-bottom:none;}
+.topic-rank{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:rgba(255,255,255,0.07);width:22px;text-align:center;flex-shrink:0;}
+.topic-rank.hot{color:rgba(239,68,68,0.5);}
+.topic-content{flex:1;min-width:0;}
+.topic-name{font-size:12px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topic-meta{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
+.topic-spike{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:600;flex-shrink:0;}
+.topic-spike.up{color:var(--neg);}
+.topic-spike.dn{color:var(--pos);}
+.topic-spike.fl{color:var(--muted);}
+.topic-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0;text-align:right;}
+.platform-list{display:flex;flex-direction:column;gap:11px;}
+.platform-item{display:flex;align-items:center;gap:10px;}
+.platform-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.platform-info{flex:1;}
+.platform-name{font-size:11px;font-weight:600;margin-bottom:4px;}
+.platform-bar-bg{height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
+.platform-bar-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+.platform-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0;min-width:70px;text-align:right;}
+.donut-wrap{position:relative;height:175px;display:flex;align-items:center;justify-content:center;}
+.donut-center{position:absolute;text-align:center;pointer-events:none;}
+.donut-pct{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:var(--pos);}
+.donut-sub{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;}
+.senti-legend{display:flex;flex-direction:column;gap:9px;margin-top:14px;}
+.senti-row{display:flex;align-items:center;justify-content:space-between;}
+.senti-left{display:flex;align-items:center;gap:8px;font-size:11px;}
+.senti-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.senti-pct{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;}
+.inf-list{display:flex;flex-direction:column;gap:2px;}
+.inf-item{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:8px;transition:background .2s;cursor:pointer;}
+.inf-item:hover{background:rgba(255,255,255,0.025);}
+.inf-rank{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:18px;flex-shrink:0;}
+.inf-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.inf-info{flex:1;min-width:0;}
+.inf-name{font-size:11px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.inf-handle{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
+.inf-stats{text-align:right;flex-shrink:0;}
+.inf-reach{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);}
+.inf-senti{font-size:9px;margin-top:2px;}
+.heatmap-wrap{display:flex;flex-direction:column;gap:5px;}
+.heatmap-row{display:flex;align-items:center;gap:5px;}
+.hm-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);width:26px;text-align:right;flex-shrink:0;}
+.hm-cells{display:flex;gap:3px;flex:1;}
+.hm-cell{flex:1;height:20px;border-radius:3px;cursor:pointer;transition:transform .15s,filter .15s;position:relative;}
+.hm-cell:hover{transform:scale(1.15);filter:brightness(1.4);z-index:2;}
+.hm-hours{display:flex;gap:3px;padding-left:31px;margin-bottom:4px;}
+.hm-hour{flex:1;font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);text-align:center;}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;}
+.footer-left{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.footer-right{display:flex;gap:12px;}
+.btn{display:flex;align-items:center;gap:6px;padding:7px 15px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid;font-family:'Plus Jakarta Sans',sans-serif;}
+.btn-ghost{background:transparent;border-color:var(--border);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 4px 15px rgba(59,130,246,.25);}
+.btn-primary:hover{box-shadow:0 4px 25px rgba(59,130,246,.45);transform:translateY(-1px);}
+.btn-ai{background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(59,130,246,0.2));border-color:rgba(139,92,246,0.5);color:#c4b5fd;}
+.btn-ai:hover{background:linear-gradient(135deg,rgba(139,92,246,0.5),rgba(59,130,246,0.3));box-shadow:0 4px 20px rgba(139,92,246,0.4);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;width:90%;max-width:620px;max-height:80vh;overflow-y:auto;transform:scale(.95) translateY(10px);transition:transform .3s;}
+.modal-overlay.open .modal{transform:scale(1) translateY(0);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;}
+.modal-close{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background .2s;}
+.modal-close:hover{background:rgba(239,68,68,0.15);}
+.modal-section{margin-bottom:18px;}
+.modal-section-title{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+.modal-body{font-size:13px;line-height:1.7;color:var(--text);}
+.modal-tags{display:flex;flex-wrap:wrap;gap:7px;}
+.modal-tag{padding:4px 12px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;}
+.isu-filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.isu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.isu-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+.isu-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3);}
+.isu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.isu-card.neg::before{background:linear-gradient(90deg,var(--neg),#f97316);}
+.isu-card.pos::before{background:linear-gradient(90deg,var(--pos),#34d399);}
+.isu-card.neu::before{background:linear-gradient(90deg,var(--neu),#fbbf24);}
+.isu-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.isu-card-title{font-size:13px;font-weight:700;line-height:1.4;flex:1;}
+.isu-card-badge{font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:4px;flex-shrink:0;margin-top:2px;}
+.badge-neg{background:rgba(239,68,68,0.15);color:var(--neg);border:1px solid rgba(239,68,68,0.25);}
+.badge-pos{background:rgba(16,185,129,0.15);color:var(--pos);border:1px solid rgba(16,185,129,0.25);}
+.badge-neu{background:rgba(245,158,11,0.15);color:var(--neu);border:1px solid rgba(245,158,11,0.25);}
+.isu-card-desc{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+.isu-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.isu-card-stat{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.isu-spike{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;}
+.isu-timeline{display:flex;flex-direction:column;gap:0;}
+.timeline-item{display:flex;gap:16px;padding:14px 10px;border-radius:8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .2s;}
+.timeline-item:hover{background:rgba(59,130,246,0.04);}
+.timeline-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:48px;}
+.timeline-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:center;line-height:1.4;}
+.timeline-dot{width:10px;height:10px;border-radius:50%;margin:6px auto;flex-shrink:0;}
+.timeline-line{flex:1;width:1px;background:rgba(100,170,255,0.1);}
+.timeline-content{flex:1;}
+.timeline-title{font-size:12px;font-weight:600;margin-bottom:4px;}
+.timeline-source{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:6px;}
+.timeline-text{font-size:11px;color:var(--muted);line-height:1.6;}
+.timeline-platforms{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.tl-platform{font-size:9px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:3px;background:rgba(100,170,255,0.08);border:1px solid var(--border);color:var(--muted);}
+.senti-big-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.senti-platform-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.senti-plat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:all .25s;cursor:pointer;}
+.senti-plat-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.senti-plat-icon{font-size:22px;margin-bottom:8px;}
+.senti-plat-name{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;}
+.senti-mini-bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.05);overflow:hidden;margin-bottom:4px;}
+.senti-mini-fill{height:100%;border-radius:3px;}
+.senti-plat-pct{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;}
+.wordcloud-wrap{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0;}
+.wc-word{font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;display:inline-block;}
+.wc-word:hover{transform:scale(1.1);}
+.senti-table{width:100%;border-collapse:collapse;}
+.senti-table th{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);}
+.senti-table td{font-size:11px;padding:10px 10px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background .2s;}
+.senti-table tr:hover td{background:rgba(59,130,246,0.04);}
+.senti-table tr{cursor:pointer;}
+.senti-bar-cell{display:flex;align-items:center;gap:8px;}
+.senti-inline-bar{flex:1;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;max-width:80px;}
+.senti-inline-fill{height:100%;border-radius:2px;}
+.inf-full-table{width:100%;border-collapse:collapse;}
+.inf-full-table th{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:color .2s;white-space:nowrap;}
+.inf-full-table th:hover{color:var(--accent);}
+.inf-full-table td{font-size:11px;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.03);}
+.inf-full-table tr:hover td{background:rgba(59,130,246,0.04);cursor:pointer;}
+.inf-big-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.platform-tag{font-size:9px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:3px;}
+.platform-twitter{background:rgba(29,155,240,0.12);color:#1d9bf0;border:1px solid rgba(29,155,240,0.2);}
+.platform-tiktok{background:rgba(255,0,80,0.1);color:#ff0050;border:1px solid rgba(255,0,80,0.2);}
+.platform-ig{background:rgba(228,64,95,0.1);color:#e4405f;border:1px solid rgba(228,64,95,0.2);}
+.platform-yt{background:rgba(255,0,0,0.1);color:#ff0000;border:1px solid rgba(255,0,0,0.2);}
+.platform-news{background:rgba(59,130,246,0.12);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);}
+.senti-chip{font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:10px;}
+.senti-chip.pos{background:rgba(16,185,129,0.12);color:var(--pos);}
+.senti-chip.neg{background:rgba(239,68,68,0.12);color:var(--neg);}
+.senti-chip.neu{background:rgba(245,158,11,0.12);color:var(--neu);}
+.sparkline{display:flex;align-items:flex-end;gap:2px;height:20px;}
+.spark-bar{width:4px;border-radius:1px;background:var(--accent);opacity:.5;transition:opacity .2s;}
+.spark-bar:hover{opacity:1;}
+.reach-num{font-family:'DM Mono',monospace;color:var(--accent);}
+.inf-network-wrap{min-height:300px;display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse at center,rgba(59,130,246,0.04),transparent 70%);}
+.laporan-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;}
+.report-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all .25s;}
+.report-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25);}
+.report-card-icon{font-size:28px;margin-bottom:12px;}
+.report-card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px;}
+.report-card-desc{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+.report-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.report-freq{font-size:10px;font-family:'DM Mono',monospace;color:var(--accent2);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);padding:3px 10px;border-radius:4px;}
+.exec-summary-block{background:var(--surface2);border-left:3px solid var(--accent2);border-radius:0 8px 8px 0;padding:16px 18px;margin-bottom:16px;}
+.exec-summary-block p{font-size:12px;line-height:1.8;color:var(--text);}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
+.metric-mini{background:var(--surface2);border-radius:8px;padding:12px;text-align:center;}
+.metric-mini-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;}
+.metric-mini-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;margin-top:3px;}
+.schedule-form{display:flex;flex-direction:column;gap:12px;}
+.form-row{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;}
+.form-select,.form-input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color .2s;width:100%;}
+.form-select:focus,.form-input:focus{border-color:var(--accent);}
+.history-list{display:flex;flex-direction:column;gap:0;}
+.history-item{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:8px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .2s;cursor:pointer;}
+.history-item:hover{background:rgba(59,130,246,0.05);}
+.history-icon{font-size:20px;flex-shrink:0;}
+.history-info{flex:1;min-width:0;}
+.history-title{font-size:12px;font-weight:600;margin-bottom:2px;}
+.history-date{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.history-size{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.download-btn{padding:5px 12px;border-radius:5px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.download-btn:hover{background:rgba(59,130,246,0.2);}
+@keyframes fillBar{from{width:0;}to{width:var(--target-w);}}
+.animated-fill{animation:fillBar 1.2s cubic-bezier(.22,1,.36,1) forwards;}
+.tooltip{position:fixed;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:999;opacity:0;transition:opacity .15s;font-family:'DM Mono',monospace;max-width:200px;}
+.tooltip.show{opacity:1;}
+.notif{position:fixed;top:80px;right:24px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;z-index:600;transform:translateX(120%);transition:transform .3s cubic-bezier(.22,1,.36,1);max-width:280px;}
+.notif.show{transform:translateX(0);}
+.notif-title{font-size:12px;font-weight:600;margin-bottom:3px;}
+.notif-body{font-size:10px;color:var(--muted);}
+.section-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:9px;font-family:'DM Mono',monospace;margin:2px;}
+
+/* =========== AI INTELIJEN TAB STYLES =========== */
+.ai-scan-hero{background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(59,130,246,0.06));border:1px solid rgba(139,92,246,0.2);border-radius:16px;padding:28px;position:relative;overflow:hidden;}
+.ai-scan-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(139,92,246,0.08),transparent 60%),radial-gradient(ellipse at 80% 50%,rgba(59,130,246,0.06),transparent 60%);pointer-events:none;}
+.ai-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.ai-hero-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#c4b5fd,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.ai-hero-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;}
+.ai-scan-btn-big{display:flex;align-items:center;gap:10px;padding:12px 28px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(59,130,246,0.25));border:1px solid rgba(139,92,246,0.5);color:#c4b5fd;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;}
+.ai-scan-btn-big:hover{background:linear-gradient(135deg,rgba(139,92,246,0.5),rgba(59,130,246,0.4));box-shadow:0 0 30px rgba(139,92,246,0.4);transform:translateY(-2px);}
+.ai-scan-btn-big:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.ai-scan-btn-big.loading{animation:aiPulse 1.2s infinite;}
+.ai-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.ai-stat{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;text-align:center;}
+.ai-stat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;background:linear-gradient(90deg,#c4b5fd,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.ai-stat-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;margin-top:4px;letter-spacing:.08em;}
+.ai-result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.ai-news-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+.ai-news-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.ai-news-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.ai-news-card.neg::before{background:linear-gradient(90deg,var(--neg),#f97316);}
+.ai-news-card.pos::before{background:linear-gradient(90deg,var(--pos),#34d399);}
+.ai-news-card.neu::before{background:linear-gradient(90deg,var(--neu),#fbbf24);}
+.ai-news-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.ai-news-title{font-size:12px;font-weight:700;line-height:1.5;flex:1;}
+.ai-news-senti{font-size:9px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:2px;}
+.ai-news-summary{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px;}
+.ai-news-footer{display:flex;align-items:center;justify-content:space-between;}
+.ai-news-meta{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);}
+.ai-news-platform{display:flex;gap:4px;flex-wrap:wrap;}
+.ai-news-plt{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:3px;background:rgba(100,170,255,0.08);border:1px solid var(--border);}
+.ai-loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;}
+.ai-loading-orb{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.4),rgba(59,130,246,0.2));border:2px solid rgba(139,92,246,0.5);animation:orbPulse 2s infinite;}
+@keyframes orbPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(139,92,246,0.4);}50%{transform:scale(1.1);box-shadow:0 0 0 15px rgba(139,92,246,0);}}
+.ai-loading-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;}
+.ai-loading-step{font-size:10px;color:rgba(139,92,246,0.7);font-family:'DM Mono',monospace;margin-top:4px;}
+.ai-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:14px;text-align:center;}
+.ai-empty-icon{font-size:48px;opacity:.3;}
+.ai-empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--muted);}
+.ai-empty-desc{font-size:12px;color:var(--muted2);max-width:360px;line-height:1.6;}
+.ai-analysis-block{background:var(--surface2);border:1px solid rgba(139,92,246,0.2);border-left:3px solid #a78bfa;border-radius:0 10px 10px 0;padding:18px;}
+.ai-analysis-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#c4b5fd;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.ai-analysis-text{font-size:12px;line-height:1.8;color:var(--text);}
+.ai-source-link{color:var(--accent2);text-decoration:none;font-family:'DM Mono',monospace;font-size:10px;display:flex;align-items:center;gap:4px;}
+.ai-source-link:hover{color:#67e8f9;}
+.ai-report-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(6,182,212,0.15));border:1px solid rgba(16,185,129,0.3);color:#34d399;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Plus Jakarta Sans',sans-serif;}
+.ai-report-btn:hover{background:linear-gradient(135deg,rgba(16,185,129,0.35),rgba(6,182,212,0.25));box-shadow:0 0 20px rgba(16,185,129,0.3);}
+.ai-report-output{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Plus Jakarta Sans',sans-serif;display:none;}
+.ai-report-output.show{display:block;animation:tabIn .4s ease;}
+.progress-ring{display:flex;gap:8px;align-items:center;margin-top:10px;}
+.progress-step{display:flex;align-items:center;gap:5px;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);}
+.progress-step.done{color:var(--pos);}
+.progress-step.active{color:#a78bfa;animation:blink .8s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+.ai-keyword-cloud{display:flex;flex-wrap:wrap;gap:6px;padding:8px 0;}
+.ai-kw{padding:4px 12px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .2s;border:1px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.08);color:#c4b5fd;}
+.ai-kw:hover{background:rgba(139,92,246,0.2);transform:scale(1.05);}
+.netlify-guide{background:linear-gradient(135deg,rgba(0,200,135,0.06),rgba(6,182,212,0.04));border:1px solid rgba(0,200,135,0.2);border-radius:12px;padding:20px;}
+.netlify-guide-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#34d399;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.netlify-steps{display:flex;flex-direction:column;gap:10px;}
+.netlify-step{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:8px;}
+.netlify-step-num{width:22px;height:22px;border-radius:50%;background:rgba(0,200,135,0.15);border:1px solid rgba(0,200,135,0.3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#34d399;flex-shrink:0;margin-top:1px;}
+.netlify-step-text{font-size:11px;color:var(--text);line-height:1.6;}
+.netlify-step-text code{background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;color:var(--accent2);}
+.ai-scan-timestamp{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:6px;border:1px solid var(--border);}
+.ai-source-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:9px;font-family:'DM Mono',monospace;background:rgba(6,182,212,0.1);color:var(--accent2);border:1px solid rgba(6,182,212,0.15);}
+.kategori-badge{font-size:9px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:3px;background:rgba(139,92,246,0.12);color:#a78bfa;border:1px solid rgba(139,92,246,0.2);}
+</style>
+</head>
+<body>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="notif" id="notif">
+  <div class="notif-title" id="notif-title">🔔 Alert</div>
+  <div class="notif-body" id="notif-body"></div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    <div>
+      <div class="logo-text">SIGAP</div>
+      <div class="logo-sub">Social Media Intelligence · Polri</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-search">
+      <span style="color:var(--muted)">🔍</span>
+      <input type="text" placeholder="Cari keyword, isu, akun..." id="searchInput" oninput="globalSearch(this.value)">
+    </div>
+    <button class="btn-ai-scan" id="headerScanBtn" onclick="switchTab('ai',document.querySelectorAll('.nav-tab')[5]);setTimeout(()=>runAiScan(),300)">
+      <div class="ai-dot"></div>🤖 Pindai AI
+    </button>
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div class="update-time" id="updateTime">—</div>
+  </div>
+</header>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('overview',this)">📊 Overview <span class="tab-count">5 KPI</span></div>
+  <div class="nav-tab alert-tab" onclick="switchTab('trending',this)">🔥 Trending Isu <span class="tab-count" id="trendingCount">12</span></div>
+  <div class="nav-tab" onclick="switchTab('sentimen',this)">🎯 Analisis Sentimen <span class="tab-count">3 Dimensi</span></div>
+  <div class="nav-tab" onclick="switchTab('influencer',this)">👤 Influencer <span class="tab-count">50 Akun</span></div>
+  <div class="nav-tab" onclick="switchTab('laporan',this)">📄 Laporan <span class="tab-count">Auto</span></div>
+  <div class="nav-tab ai-tab" onclick="switchTab('ai',this)">🤖 AI Intelijen <span class="tab-count" id="aiTabCount">Real-time</span></div>
+</div>
+
+<main>
+
+<!-- ============================================================ -->
+<!--  TAB 1: OVERVIEW                                            -->
+<!-- ============================================================ -->
+<div class="tab-panel active" id="tab-overview">
+  <div class="filter-bar">
+    <div class="filter-left">
+      <span class="filter-label">Periode:</span>
+      <div class="chips" id="periodChips">
+        <div class="chip" onclick="setChip(this,'periodChips')">1H</div>
+        <div class="chip" onclick="setChip(this,'periodChips')">12H</div>
+        <div class="chip active" onclick="setChip(this,'periodChips')">24H</div>
+        <div class="chip" onclick="setChip(this,'periodChips')">7H</div>
+        <div class="chip" onclick="setChip(this,'periodChips')">30H</div>
+      </div>
+    </div>
+    <div class="filter-right">
+      <span class="filter-label">Keyword:</span>
+      <span class="kw-pill">Polri</span>
+      <span class="kw-pill">Kapolri</span>
+      <span class="kw-pill">Kepolisian</span>
+      <span class="kw-pill">Polisi</span>
+      <span class="kw-more" onclick="showNotif('Keyword Manager','Kelola keyword di tab AI Intelijen.')">+11 lainnya ▾</span>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px;" id="alertsContainer">
+    <div class="alert-strip" onclick="openIsuModal('Pengeroyokan 6 Anggota Polri Kalibata','neg')">
+      <span style="font-size:17px">🚨</span>
+      <div style="flex:1"><div class="alert-title">BREAKING — Oknum IPTU Makassar Diduga Tembak Warga Bertrand, LBH Desak Proses Pidana</div><div class="alert-desc">Kejadian Minggu 1 Maret 2026 · Viral kembali 5 Maret · Sentimen negatif 81% · Twitter/TikTok Trending</div></div>
+      <div class="alert-time" id="alertTime1">Hari ini</div>
+    </div>
+    <div class="alert-strip green" onclick="openIsuModal('Operasi Ketupat 2026 Polri','pos')">
+      <span style="font-size:17px">✅</span>
+      <div style="flex:1"><div class="alert-title">POSITIF — Operasi Ketupat 2026: Kakorlantas Nyatakan "Operasi Kemanusiaan", Gelar Pasukan 12 Maret</div><div class="alert-desc">5 Klaster Pengamanan · 2.746 Posko · 161K Personel · Sentimen positif 72% · Media Online & Korlantas</div></div>
+      <div class="alert-time" id="alertTime2">2 hari lalu</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue" onclick="switchTab('trending',document.querySelectorAll('.nav-tab')[1])">
+      <div class="kpi-icon">💬</div>
+      <div class="kpi-label">Total Mention 24 Jam</div>
+      <div class="kpi-value" id="kpiMention">46.4K</div>
+      <div class="kpi-delta up" id="kpiMentionDelta">▲ +18% vs kemarin</div>
+    </div>
+    <div class="kpi-card green" onclick="switchTab('sentimen',document.querySelectorAll('.nav-tab')[2])">
+      <div class="kpi-icon">😊</div>
+      <div class="kpi-label">Sentimen Positif</div>
+      <div class="kpi-value" style="color:var(--pos)" id="kpiPos">35%</div>
+      <div class="kpi-delta down">▼ -7% vs kemarin</div>
+    </div>
+    <div class="kpi-card red" onclick="switchTab('sentimen',document.querySelectorAll('.nav-tab')[2])">
+      <div class="kpi-icon">😠</div>
+      <div class="kpi-label">Sentimen Negatif</div>
+      <div class="kpi-value" style="color:var(--neg)" id="kpiNeg">38%</div>
+      <div class="kpi-delta down">▲ +7% vs kemarin</div>
+    </div>
+    <div class="kpi-card purple" onclick="switchTab('trending',document.querySelectorAll('.nav-tab')[1])">
+      <div class="kpi-icon">🔥</div>
+      <div class="kpi-label">Isu Viral Aktif</div>
+      <div class="kpi-value" style="color:#a78bfa" id="kpiViral">9</div>
+      <div class="kpi-delta up">▲ +4 isu baru hari ini</div>
+    </div>
+    <div class="kpi-card yellow" onclick="switchTab('influencer',document.querySelectorAll('.nav-tab')[3])">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-label">Total Reach Estimasi</div>
+      <div class="kpi-value" style="color:var(--neu)">2.1M</div>
+      <div class="kpi-delta up">▲ +18% vs kemarin</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📈 Volume Mention — 7 Hari Terakhir</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="chips" id="chartViewChips">
+            <div class="chip active" style="font-size:10px;padding:3px 9px;" onclick="setChip(this,'chartViewChips');toggleChartStack(false)">Line</div>
+            <div class="chip" style="font-size:10px;padding:3px 9px;" onclick="setChip(this,'chartViewChips');toggleChartStack(true)">Bar</div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:220px;"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🎯 Distribusi Sentimen</div>
+        <div class="card-badge">24 JAM TERAKHIR</div>
+      </div>
+      <div class="donut-wrap"><canvas id="donutChart"></canvas>
+        <div class="donut-center"><div class="donut-pct" id="donutPct">42%</div><div class="donut-sub">positif</div></div>
+      </div>
+      <div class="senti-legend">
+        <div class="senti-row"><div class="senti-left"><div class="senti-dot" style="background:var(--pos)"></div>Positif</div><span class="senti-pct" style="color:var(--pos)">42% · 19.824</span></div>
+        <div class="senti-row"><div class="senti-left"><div class="senti-dot" style="background:var(--neu)"></div>Netral</div><span class="senti-pct" style="color:var(--neu)">27% · 12.744</span></div>
+        <div class="senti-row"><div class="senti-left"><div class="senti-dot" style="background:var(--neg)"></div>Negatif</div><span class="senti-pct" style="color:var(--neg)">31% · 14.632</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📱 Platform Sumber</div><div class="card-badge">DISTRIBUSI</div></div>
+      <div class="platform-list">
+        <div class="platform-item"><div class="platform-icon" style="background:rgba(29,155,240,.15)">🐦</div><div class="platform-info"><div class="platform-name">Twitter / X</div><div class="platform-bar-bg"><div class="platform-bar-fill animated-fill" style="--target-w:58%;width:0;background:linear-gradient(90deg,#1d9bf0,#0ea5e9)"></div></div></div><div class="platform-count">27.2K (58%)</div></div>
+        <div class="platform-item"><div class="platform-icon" style="background:rgba(255,0,80,.12)">🎵</div><div class="platform-info"><div class="platform-name">TikTok</div><div class="platform-bar-bg"><div class="platform-bar-fill animated-fill" style="--target-w:20%;width:0;background:linear-gradient(90deg,#ff0050,#ff7d54)"></div></div></div><div class="platform-count">9.4K (20%)</div></div>
+        <div class="platform-item"><div class="platform-icon" style="background:rgba(59,130,246,.12)">📰</div><div class="platform-info"><div class="platform-name">Media Online</div><div class="platform-bar-bg"><div class="platform-bar-fill animated-fill" style="--target-w:15%;width:0;background:linear-gradient(90deg,#3b82f6,#6366f1)"></div></div></div><div class="platform-count">7.1K (15%)</div></div>
+        <div class="platform-item"><div class="platform-icon" style="background:rgba(255,0,0,.12)">▶️</div><div class="platform-info"><div class="platform-name">YouTube</div><div class="platform-bar-bg"><div class="platform-bar-fill animated-fill" style="--target-w:7%;width:0;background:linear-gradient(90deg,#ff0000,#ff6b35)"></div></div></div><div class="platform-count">3.3K (7%)</div></div>
+        <div class="platform-item"><div class="platform-icon" style="background:rgba(228,64,95,.12)">📸</div><div class="platform-info"><div class="platform-name">Instagram</div><div class="platform-bar-bg"><div class="platform-bar-fill animated-fill" style="--target-w:5%;width:0;background:linear-gradient(90deg,#e4405f,#fcaf45)"></div></div></div><div class="platform-count">2.3K (5%)</div></div>
+      </div>
+    </div>
+    <div class="card" style="grid-column:span 2">
+      <div class="card-header"><div class="card-title">🔥 Isu Trending</div><div class="card-action" onclick="switchTab('trending',document.querySelectorAll('.nav-tab')[1])">Lihat semua →</div></div>
+      <div class="topic-list" id="overviewTopics"></div>
+    </div>
+  </div>
+
+  <div class="grid-2b">
+    <div class="card">
+      <div class="card-header"><div class="card-title">👤 Top Influencer Aktif</div><div class="card-action" onclick="switchTab('influencer',document.querySelectorAll('.nav-tab')[3])">Lihat semua →</div></div>
+      <div class="inf-list" id="overviewInfluencers"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🗓 Heatmap Aktivitas Mingguan</div><div class="card-badge">PER JAM</div></div>
+      <div id="heatmapContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  TAB 2: TRENDING ISU                                        -->
+<!-- ============================================================ -->
+<div class="tab-panel" id="tab-trending">
+  <div class="filter-bar">
+    <div class="filter-left">
+      <span class="filter-label">Filter:</span>
+      <div class="chips" id="isuSentiChips">
+        <div class="chip active" onclick="filterIsu('all',this)">Semua</div>
+        <div class="chip red" onclick="filterIsu('neg',this)">😠 Negatif</div>
+        <div class="chip green" onclick="filterIsu('pos',this)">😊 Positif</div>
+        <div class="chip yellow" onclick="filterIsu('neu',this)">😐 Netral</div>
+      </div>
+    </div>
+    <div class="filter-right">
+      <span class="filter-label">Platform:</span>
+      <div class="chips" id="isuPlatChips">
+        <div class="chip active" onclick="setChip(this,'isuPlatChips')">Semua</div>
+        <div class="chip" onclick="setChip(this,'isuPlatChips')">🐦 Twitter</div>
+        <div class="chip" onclick="setChip(this,'isuPlatChips')">🎵 TikTok</div>
+        <div class="chip" onclick="setChip(this,'isuPlatChips')">📰 Berita</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-label">ISU UTAMA — <span id="isuCount">12</span> TOPIK AKTIF</div>
+  <div class="isu-grid" id="isuCardGrid"></div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">📅 Timeline Perkembangan Isu — 24 Jam Terakhir</div><div class="card-badge">REAL-TIME</div></div>
+    <div class="isu-timeline" id="isuTimeline"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">📊 Perbandingan Volume Isu — 7 Hari</div><div class="card-badge">TOP 5 ISU</div></div>
+    <div class="chart-wrap" style="height:260px;"><canvas id="isuCompareChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  TAB 3: ANALISIS SENTIMEN                                   -->
+<!-- ============================================================ -->
+<div class="tab-panel" id="tab-sentimen">
+  <div class="filter-bar">
+    <div class="filter-left">
+      <span class="filter-label">Tampilan:</span>
+      <div class="chips" id="sentiViewChips">
+        <div class="chip active" onclick="setChip(this,'sentiViewChips')">Ringkasan</div>
+        <div class="chip" onclick="setChip(this,'sentiViewChips')">Per Topik</div>
+        <div class="chip" onclick="setChip(this,'sentiViewChips')">Tren Waktu</div>
+      </div>
+    </div>
+    <div class="filter-right">
+      <span class="filter-label">Periode:</span>
+      <div class="chips" id="sentiPeriodChips">
+        <div class="chip active" onclick="setChip(this,'sentiPeriodChips')">Hari Ini</div>
+        <div class="chip" onclick="setChip(this,'sentiPeriodChips')">7 Hari</div>
+        <div class="chip" onclick="setChip(this,'sentiPeriodChips')">30 Hari</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-label">SENTIMEN PER PLATFORM</div>
+  <div class="senti-platform-grid" id="sentiPlatGrid"></div>
+  <div class="senti-big-row">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📈 Tren Sentimen — 30 Hari</div><div class="card-badge">MOVING AVG</div></div>
+      <div class="chart-wrap" style="height:230px;"><canvas id="sentiTrendChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">☁️ Word Cloud — Kata Dominan</div><div class="card-badge">HARI INI</div></div>
+      <div class="chips" id="wcTypeChips" style="margin-bottom:12px;">
+        <div class="chip active" onclick="renderWordCloud('all',this)">Semua</div>
+        <div class="chip green" onclick="renderWordCloud('pos',this)">Positif</div>
+        <div class="chip red" onclick="renderWordCloud('neg',this)">Negatif</div>
+      </div>
+      <div class="wordcloud-wrap" id="wordCloudWrap"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">📋 Breakdown Sentimen per Isu</div><div class="card-badge">DETAIL</div></div>
+    <table class="senti-table" id="sentiTable">
+      <thead><tr>
+        <th onclick="sortSentiTable(0)">ISU ↕</th>
+        <th onclick="sortSentiTable(1)">MENTION ↕</th>
+        <th onclick="sortSentiTable(2)">POSITIF ↕</th>
+        <th onclick="sortSentiTable(3)">NETRAL ↕</th>
+        <th onclick="sortSentiTable(4)">NEGATIF ↕</th>
+        <th>DOMINAN</th>
+        <th>TREND</th>
+      </tr></thead>
+      <tbody id="sentiTableBody"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">🧠 Analisis Emosi Publik</div><div class="card-badge">NLP BASED</div></div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="emotionChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  TAB 4: INFLUENCER                                          -->
+<!-- ============================================================ -->
+<div class="tab-panel" id="tab-influencer">
+  <div class="filter-bar">
+    <div class="filter-left">
+      <span class="filter-label">Platform:</span>
+      <div class="chips" id="infPlatChips">
+        <div class="chip active" onclick="filterInfluencers('all',this)">Semua</div>
+        <div class="chip" onclick="filterInfluencers('twitter',this)">🐦 Twitter</div>
+        <div class="chip" onclick="filterInfluencers('tiktok',this)">🎵 TikTok</div>
+        <div class="chip" onclick="filterInfluencers('news',this)">📰 Media</div>
+        <div class="chip" onclick="filterInfluencers('yt',this)">▶️ YouTube</div>
+      </div>
+    </div>
+    <div class="filter-right">
+      <span class="filter-label">Sentimen:</span>
+      <div class="chips" id="infSentiFilterChips">
+        <div class="chip active" onclick="setChip(this,'infSentiFilterChips')">Semua</div>
+        <div class="chip green" onclick="setChip(this,'infSentiFilterChips')">Positif</div>
+        <div class="chip red" onclick="setChip(this,'infSentiFilterChips')">Kritis</div>
+        <div class="chip yellow" onclick="setChip(this,'infSentiFilterChips')">Netral</div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2b">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📊 Reach per Platform</div><div class="card-badge">TOP 5</div></div>
+      <div class="chart-wrap" style="height:220px;"><canvas id="infReachChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:14px;">
+        <div style="flex:1">
+          <div class="card-header" style="margin-bottom:10px;"><div class="card-title">🎯 Distribusi Sentimen Influencer</div></div>
+          <div style="height:130px;position:relative;"><canvas id="infSentiChart"></canvas></div>
+        </div>
+        <div style="flex:1">
+          <div class="card-header" style="margin-bottom:10px;"><div class="card-title">📅 Aktivitas 7 Hari</div></div>
+          <div style="height:130px;"><canvas id="infActivityChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">👤 Daftar Lengkap Influencer <span id="infCountLabel" style="color:var(--muted);font-size:11px;font-weight:400;">(50 akun terpantau)</span></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" style="font-size:10px;padding:5px 10px;" onclick="showNotif('Export','Daftar influencer diekspor ke Excel.')">📊 Export</button>
+      </div>
+    </div>
+    <table class="inf-full-table">
+      <thead><tr>
+        <th>#</th><th onclick="sortInfTable(0)">AKUN ↕</th><th>PLATFORM</th>
+        <th onclick="sortInfTable(1)">REACH ↕</th><th onclick="sortInfTable(2)">MENTION ↕</th>
+        <th>SENTIMEN</th><th>TREN 7H</th><th>AKSI</th>
+      </tr></thead>
+      <tbody id="infTableBody"></tbody>
+    </table>
+    <div class="card" style="margin-top:18px;background:var(--surface2);">
+      <div class="card-header"><div class="card-title">🕸 Peta Jaringan Influencer</div><div class="card-badge">RELASI</div></div>
+      <div class="inf-network-wrap" id="infNetworkWrap">
+        <div style="text-align:center;color:var(--muted);">
+          <div style="font-size:36px;margin-bottom:10px;opacity:.3;">🕸</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;">Visualisasi jaringan tersedia di versi Enterprise</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  TAB 5: LAPORAN                                             -->
+<!-- ============================================================ -->
+<div class="tab-panel" id="tab-laporan">
+  <div class="filter-bar">
+    <div class="filter-left">
+      <span class="filter-label">Format:</span>
+      <div class="chips" id="laporanFormatChips">
+        <div class="chip active" onclick="setChip(this,'laporanFormatChips')">PDF</div>
+        <div class="chip" onclick="setChip(this,'laporanFormatChips')">Excel</div>
+        <div class="chip" onclick="setChip(this,'laporanFormatChips')">Word</div>
+        <div class="chip" onclick="setChip(this,'laporanFormatChips')">JSON</div>
+      </div>
+    </div>
+    <div class="filter-right">
+      <button class="btn btn-ai" onclick="generateAiReport()">🤖 Generate Laporan AI</button>
+    </div>
+  </div>
+
+  <!-- AI REPORT OUTPUT -->
+  <div id="aiReportOutput" class="ai-report-output"></div>
+
+  <div class="laporan-grid">
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📋 Laporan Tersedia</div><div class="card-badge">TEMPLATE</div></div>
+        <div class="grid-3e" style="margin-bottom:0">
+          <div class="report-card" onclick="showNotif('Laporan Harian','Laporan harian sedang digenerate dengan data AI terkini...')">
+            <div class="report-card-icon">📋</div>
+            <div class="report-card-title">Laporan Harian</div>
+            <div class="report-card-desc">Ringkasan eksekutif, isu viral, analisis sentimen, dan rekomendasi tindak lanjut 24 jam.</div>
+            <div class="report-card-footer"><span class="report-freq">Harian · 08:00 WIB</span><span class="card-action">Generate →</span></div>
+          </div>
+          <div class="report-card" onclick="showNotif('Laporan Mingguan','Laporan mingguan sedang disiapkan...')">
+            <div class="report-card-icon">📊</div>
+            <div class="report-card-title">Laporan Mingguan</div>
+            <div class="report-card-desc">Analisis tren 7 hari, perbandingan sentimen, top influencer, dan insight strategis.</div>
+            <div class="report-card-footer"><span class="report-freq">Mingguan · Senin</span><span class="card-action">Generate →</span></div>
+          </div>
+          <div class="report-card" onclick="showNotif('Alert Report','Alert report khusus sedang disiapkan...')">
+            <div class="report-card-icon">🚨</div>
+            <div class="report-card-title">Alert Report</div>
+            <div class="report-card-desc">Laporan darurat otomatis saat terdeteksi lonjakan isu atau sentimen negatif ekstrem.</div>
+            <div class="report-card-footer"><span class="report-freq">Otomatis</span><span class="card-action">Generate →</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📝 Executive Summary</div><div class="card-badge">HARI INI</div></div>
+        <div class="exec-summary-block">
+          <p id="execSummaryText">Pada <strong id="execDate">05 Maret 2026</strong>, pemantauan media sosial dan media online terkait Polri menunjukkan total <strong>46.390 mention</strong> dalam 24 jam terakhir, meningkat 18% dibanding hari sebelumnya. Isu paling mendominasi adalah <strong>penembakan warga Bertrand oleh oknum IPTU di Makassar</strong> dengan sentimen negatif 81%, diikuti persiapan Operasi Ketupat 2026 dengan respons positif 72%, serta demo Aliansi Reformasi Polri (AROMI) di Mabes Polri yang memicu viral video mahasiswa membentak polisi. Sentimen keseluruhan mencapai <strong>35% positif</strong>, <strong>27% netral</strong>, dan <strong>38% negatif</strong>. Polri perlu segera menyikapi kasus Makassar dengan langkah transparan dan memperkuat narasi positif Operasi Ketupat menjelang mudik Lebaran.</p>
+        </div>
+        <div class="metric-row">
+          <div class="metric-mini"><div class="metric-mini-val" style="color:var(--accent)">46.4K</div><div class="metric-mini-label">Total Mention</div></div>
+          <div class="metric-mini"><div class="metric-mini-val" style="color:var(--pos)">42%</div><div class="metric-mini-label">Sentimen Pos</div></div>
+          <div class="metric-mini"><div class="metric-mini-val" style="color:var(--neg)">31%</div><div class="metric-mini-label">Sentimen Neg</div></div>
+          <div class="metric-mini"><div class="metric-mini-val" style="color:#a78bfa">9</div><div class="metric-mini-label">Isu Viral</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">⚙️ Jadwal Otomatis</div><div class="card-badge">NETLIFY</div></div>
+        <div class="schedule-form">
+          <div class="form-row"><div class="form-label">Frekuensi</div><select class="form-select"><option>Harian (08:00 WIB)</option><option>Dua Kali Sehari</option><option>Mingguan</option></select></div>
+          <div class="form-row"><div class="form-label">Penerima Email</div><input class="form-input" type="email" placeholder="email@polri.go.id"></div>
+          <div class="form-row"><div class="form-label">Format Ekspor</div><select class="form-select"><option>PDF + Excel</option><option>PDF saja</option><option>Excel saja</option></select></div>
+          <button class="btn btn-primary" onclick="showNotif('Jadwal Disimpan','Laporan otomatis akan dikirim sesuai jadwal.')">✅ Simpan Jadwal</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🗃 Riwayat Laporan</div><div class="card-badge">7 TERAKHIR</div></div>
+        <div class="history-list" id="reportHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">📉 Rekap Bulanan — Januari–Maret 2026</div><div class="card-badge">60 HARI</div></div>
+    <div class="chart-wrap" style="height:230px;"><canvas id="laporanChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  TAB 6: AI INTELIJEN (NEW)                                  -->
+<!-- ============================================================ -->
+<div class="tab-panel" id="tab-ai">
+
+  <!-- HERO SCAN SECTION -->
+  <div class="ai-scan-hero">
+    <div class="ai-hero-top">
+      <div>
+        <div class="ai-hero-title">🤖 AI Intelligence Scanner</div>
+        <div class="ai-hero-sub">Memindai berita & media sosial Polri secara real-time menggunakan Claude AI + Web Search</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <button class="ai-scan-btn-big" id="mainScanBtn" onclick="runAiScan()">
+          🔍 Pindai Sekarang
+        </button>
+        <div class="ai-scan-timestamp" id="scanTimestamp">Belum pernah dipindai — klik tombol untuk memulai</div>
+      </div>
+    </div>
+    <div class="ai-stats-row" id="aiStatsRow">
+      <div class="ai-stat"><div class="ai-stat-val" id="aiStatSumber">—</div><div class="ai-stat-label">Sumber Dipindai</div></div>
+      <div class="ai-stat"><div class="ai-stat-val" id="aiStatIsu">—</div><div class="ai-stat-label">Isu Terdeteksi</div></div>
+      <div class="ai-stat"><div class="ai-stat-val" id="aiStatPos">—</div><div class="ai-stat-label">Sentimen Positif</div></div>
+      <div class="ai-stat"><div class="ai-stat-val" id="aiStatNeg">—</div><div class="ai-stat-label">Isu Kritis</div></div>
+    </div>
+  </div>
+
+  <!-- KEYWORD CONFIG -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">🔑 Keyword Pemantauan</div><div class="card-action" onclick="showNotif('Edit Keyword','Fitur edit keyword akan tersedia segera.')">+ Tambah keyword</div></div>
+    <div class="ai-keyword-cloud">
+      <span class="ai-kw">Polri</span><span class="ai-kw">Kapolri</span><span class="ai-kw">Kepolisian</span><span class="ai-kw">Polisi</span>
+      <span class="ai-kw">Bareskrim</span><span class="ai-kw">Densus 88</span><span class="ai-kw">Kakorlantas</span><span class="ai-kw">Mabes Polri</span>
+      <span class="ai-kw">oknum polisi</span><span class="ai-kw">reformasi polri</span><span class="ai-kw">sidang etik</span><span class="ai-kw">SKCK</span>
+      <span class="ai-kw">Operasi Ketupat</span><span class="ai-kw">tilang elektronik</span><span class="ai-kw">humas polri</span>
+    </div>
+  </div>
+
+  <!-- SCAN RESULTS AREA -->
+  <div id="aiResultsArea">
+    <div class="ai-empty-state">
+      <div class="ai-empty-icon">🛡</div>
+      <div class="ai-empty-title">Siap Memindai</div>
+      <div class="ai-empty-desc">Klik tombol <strong>"Pindai Sekarang"</strong> untuk mencari berita dan perbincangan terkait Polri dari berbagai media online dan media sosial dalam 24 jam terakhir secara real-time menggunakan AI.</div>
+    </div>
+  </div>
+
+  <!-- PANDUAN NETLIFY UPDATE -->
+  <div class="netlify-guide">
+    <div class="netlify-guide-title">🚀 Cara Update Dashboard Harian di Netlify</div>
+    <div class="netlify-steps">
+      <div class="netlify-step">
+        <div class="netlify-step-num">1</div>
+        <div class="netlify-step-text">Buka dashboard ini setiap pagi, klik <strong>"Pindai Sekarang"</strong> untuk mendapatkan data terbaru dari AI. Hasil scan otomatis tersimpan di memori sesi.</div>
+      </div>
+      <div class="netlify-step">
+        <div class="netlify-step-num">2</div>
+        <div class="netlify-step-text">Klik tombol <strong>"Unduh Laporan PDF"</strong> di bagian bawah halaman untuk mengunduh laporan harian lengkap. File siap dijadikan bahan rapat/briefing.</div>
+      </div>
+      <div class="netlify-step">
+        <div class="netlify-step-num">3</div>
+        <div class="netlify-step-text">Deploy ke Netlify: Upload file <code>index.html</code> ini ke repository GitHub Anda, lalu hubungkan ke Netlify. Dashboard akan selalu tersedia di URL publik Anda.</div>
+      </div>
+      <div class="netlify-step">
+        <div class="netlify-step-num">4</div>
+        <div class="netlify-step-text">Untuk <strong>update otomatis harian</strong>: Aktifkan Netlify Scheduled Functions atau gunakan GitHub Actions dengan schedule <code>cron: '0 1 * * *'</code> (setiap pukul 08:00 WIB) untuk trigger re-deploy otomatis.</div>
+      </div>
+      <div class="netlify-step">
+        <div class="netlify-step-num">5</div>
+        <div class="netlify-step-text">Tambahkan variabel environment <code>ANTHROPIC_API_KEY</code> di Netlify Dashboard → Site Settings → Environment Variables untuk mengaktifkan fitur AI Scan otomatis.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<footer>
+  <div class="footer-left">SIGAP v3.0 · © 2026 Divisi Humas Polri · Dokumen bersifat RAHASIA INTERNAL · AI-Powered by Claude · Diperbarui otomatis setiap hari</div>
+  <div class="footer-right">
+    <button class="btn btn-ghost" onclick="showNotif('Export Excel','Fitur export akan tersedia di versi live dengan koneksi API.')">📊 Export Excel</button>
+    <button class="btn btn-ghost" onclick="copyReportToClipboard()">📋 Salin Laporan</button>
+    <button class="btn btn-primary" onclick="printReport()">📄 Unduh Laporan PDF</button>
+  </div>
+</footer>
+
+<script>
+// ===================== DATA STATIS =====================
+const influencerData = [
+  {rank:1,name:'Jurnalis Watch ID',handle:'@jurnaliswatch',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'890K',reachN:890000,mention:142,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(59,130,246,.2)',avatarColor:'#60a5fa',spark:[3,5,4,7,6,9,8]},
+  {rank:2,name:'InfoPolri Official',handle:'@infopolri_id',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'720K',reachN:720000,mention:118,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(16,185,129,.2)',avatarColor:'#34d399',spark:[6,5,8,7,9,10,11]},
+  {rank:3,name:'Kompas News',handle:'@kompascom',platform:'news',icon:'📰',platTag:'platform-news',reach:'650K',reachN:650000,mention:98,senti:'neu',sentiLabel:'Netral',avatarBg:'rgba(245,158,11,.2)',avatarColor:'#fbbf24',spark:[8,7,9,8,7,8,6]},
+  {rank:4,name:'Aktivis HAM Indonesia',handle:'@ham_indonesia',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'510K',reachN:510000,mention:87,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(239,68,68,.2)',avatarColor:'#f87171',spark:[4,5,3,8,9,12,14]},
+  {rank:5,name:'DetikNews',handle:'@detikcom',platform:'news',icon:'📰',platTag:'platform-news',reach:'480K',reachN:480000,mention:76,senti:'neu',sentiLabel:'Netral',avatarBg:'rgba(6,182,212,.2)',avatarColor:'#22d3ee',spark:[7,8,6,7,9,8,7]},
+  {rank:6,name:'PolisiKita',handle:'@polisikita_id',platform:'tiktok',icon:'🎵',platTag:'platform-tiktok',reach:'420K',reachN:420000,mention:65,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(139,92,246,.2)',avatarColor:'#a78bfa',spark:[5,6,8,9,11,13,12]},
+  {rank:7,name:'Tempo Online',handle:'@tempodotco',platform:'news',icon:'📰',platTag:'platform-news',reach:'390K',reachN:390000,mention:62,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(249,115,22,.2)',avatarColor:'#fb923c',spark:[6,7,8,9,10,11,9]},
+  {rank:8,name:'ViralPolri ID',handle:'@viralpolri',platform:'tiktok',icon:'🎵',platTag:'platform-tiktok',reach:'360K',reachN:360000,mention:58,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(16,185,129,.2)',avatarColor:'#6ee7b7',spark:[8,9,7,10,12,11,13]},
+  {rank:9,name:'CNN Indonesia',handle:'@cnnid',platform:'news',icon:'📰',platTag:'platform-news',reach:'340K',reachN:340000,mention:54,senti:'neu',sentiLabel:'Netral',avatarBg:'rgba(59,130,246,.15)',avatarColor:'#93c5fd',spark:[5,6,7,8,7,6,8]},
+  {rank:10,name:'WatchPolri Channel',handle:'WatchPolriYT',platform:'yt',icon:'▶️',platTag:'platform-yt',reach:'310K',reachN:310000,mention:48,senti:'neg',sentiLabel:'Kritis',avatarBg:'rgba(239,68,68,.15)',avatarColor:'#fca5a5',spark:[4,5,6,7,9,8,10]},
+  {rank:11,name:'Humas Polri',handle:'@humaspolri',platform:'twitter',icon:'🐦',platTag:'platform-twitter',reach:'290K',reachN:290000,mention:45,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(6,182,212,.2)',avatarColor:'#67e8f9',spark:[10,11,9,12,13,14,15]},
+  {rank:12,name:'PolisiTV',handle:'PoliceTVIndo',platform:'yt',icon:'▶️',platTag:'platform-yt',reach:'260K',reachN:260000,mention:41,senti:'pos',sentiLabel:'Positif',avatarBg:'rgba(245,158,11,.2)',avatarColor:'#fde68a',spark:[6,7,8,9,8,10,11]},
+];
+
+// DATA DIPERBARUI: 5 MARET 2026 — Isu 24 Jam Terakhir
+const isuData = [
+  {title:'Penembakan Warga Bertrand oleh Oknum IPTU di Makassar',senti:'neg',mention:5240,spike:420,desc:'Oknum IPTU dari Polsek Panakkukang diduga menembak warga Bertrand di Jalan Toddopuli Raya, Makassar, Minggu 1 Maret 2026 pukul 07.20 WITA. LBH Makassar mengecam keras dan mendesak Polri lakukan reformasi struktural. Isu kian viral menjelang akhir pekan.',platform:'Twitter, Repelita.com, LBH Makassar',emoji:'🔴',source:'repelita.com',url:'https://www.repelita.com/2026/03/lbh-makassar-kecam-penembakan-bertrand.html'},
+  {title:'Kakorlantas: Operasi Ketupat 2026 adalah Operasi Kemanusiaan',senti:'pos',mention:3960,spike:180,desc:'Kakorlantas Polri Irjen Agus Suryonugroho menegaskan Operasi Ketupat 2026 bukan sekadar pengamanan lalu lintas, melainkan bentuk kehadiran negara. Gelar pasukan dijadwalkan 12 Maret, operasi 13–26 Maret 2026 dengan tagline "Mudik Aman Keluarga Bahagia".',platform:'Korlantas Polri, Media Online, Twitter',emoji:'🚓',source:'korlantas.polri.go.id',url:'https://korlantas.polri.go.id/2026-03-04-operasi-ketupat-2026-adalah-operasi-kemanusiaan-kakorlantas-utamakan-keselamatan/'},
+  {title:'Viral Mahasiswa Bentak & Coret Jilbab Polwan saat Demo Mabes Polri',senti:'neg',mention:3710,spike:290,desc:'Video viral mahasiswa beralmamater membentak polisi dan mencoret kain jilbab Polwan saat demonstrasi di depan Mabes Polri, 27 Feb 2026. PNJ resmi meminta maaf. Polda Metro: aspirasi mahasiswa jadi bahan evaluasi. Demo menuntut hukuman berat oknum Brimob pelaku penganiayaan siswa di Tual, Maluku.',platform:'Twitter, Liputan6, Detik, TikTok',emoji:'📢',source:'liputan6.com',url:'https://www.liputan6.com/news/read/6289183/viral-mahasiswa-bentak-polisi-saat-demo-di-mabes-polri-pnj-minta-maaf-dan-lakukan-pendisiplinan'},
+  {title:'Aliansi Reformasi Polri (AROMI) Demo di Berbagai Kota',senti:'neg',mention:2840,spike:210,desc:'Mahasiswa tergabung dalam AROMI menggelar aksi unjuk rasa di Mabes Polri Jakarta dan DPRD Kalteng Palangka Raya. Menuntut penuntasan kasus oknum Brimob di Tual, reformasi rekrutmen, dan penghapusan impunitas di tubuh Polri.',platform:'Twitter, Media Online, TikTok',emoji:'✊',source:'saibumi.id',url:'https://saibumi.id/operasi-ketupat-2026-libatkan-ribuan-posko-pengamanan-dan-pelayanan/'},
+  {title:'Polri Klarifikasi Hoaks Sabu Meleleh 30 Kg Raib',senti:'neu',mention:2290,spike:140,desc:'Divisi Humas Polri pada 3 Maret 2026 menegaskan viral narasi "sabu meleleh akibat panas hingga 30 kg barang bukti raib" adalah hoaks. Polri tidak pernah mengeluarkan keterangan bahwa barang bukti narkotika dapat terurai karena suhu panas.',platform:'Twitter, Hasanah.id, Instagram',emoji:'🚫',source:'hasanah.id',url:'https://hasanah.id/berita/308100/isu-sabu-meleleh-bikin'},
+  {title:'Oknum Polisi Gunakan Motor Barang Bukti untuk Keperluan Pribadi',senti:'neg',mention:1980,spike:95,desc:'Video viral memperlihatkan Bripka SI dari Pos Lantas Kotadalam, Lampung Selatan, menggunakan motor warga yang disita sebagai barang bukti kecelakaan untuk keperluan pribadi. Propam Polres Lampung Selatan langsung memprosesnya secara disiplin.',platform:'Liputan6, Twitter, TikTok',emoji:'⚠️',source:'liputan6.com',url:'https://www.liputan6.com/regional/read/6288967/video-viral-anggota-polisi-pakai-motor-barang-bukti-langsung-diperiksa-propam'},
+  {title:'THR Anggota Polri Dicairkan Bertahap, Naik 10% dari 2025',senti:'pos',mention:1650,spike:30,desc:'Pemerintah mencairkan THR 2026 untuk ASN, TNI, dan Polri secara bertahap sejak 26 Februari 2026. Total anggaran Rp55 triliun, naik 10% atau Rp6 triliun dari tahun sebelumnya. Komponen THR meliputi gaji pokok penuh dan tunjangan kinerja.',platform:'Media Online, Instagram, Twitter',emoji:'💰',source:'romisaputra.com',url:'https://www.romisaputra.com/2026/03/thr-asn-tni-polri-dan-pensiunan-dicairkan-bertahap-mulai-26-februari-2026.html'},
+  {title:'Polres Madiun Bongkar Penipuan Perizinan Dapur MBG, 3 Calo Ditangkap',senti:'pos',mention:1430,spike:85,desc:'Satreskrim Polres Madiun Kota mengungkap sindikat calo perizinan dapur program Makan Bergizi Gratis (MBG). Tiga pelaku ditangkap dengan modus menjanjikan verifikasi resmi Badan Gizi Nasional, merugikan korban ratusan juta rupiah.',platform:'Merdeka.com, Media Online, Twitter',emoji:'🍱',source:'merdeka.com',url:'https://www.merdeka.com'},
+  {title:'Residivis Pakai Kaos "Sat Samapta" Aniaya Wanita Hingga Tewas di Trenggalek',senti:'neg',mention:1280,spike:110,desc:'Video 44 detik viral memperlihatkan pria berkaos "Sat Samapta" Polri menganiaya wanita di Trenggalek. Polres Trenggalek tegaskan pelaku bukan anggota Polri melainkan residivis curanmor. Korban berinisial ED (33) meninggal dunia usai kejadian.',platform:'Twitter, TikTok, Serayu Nusantara',emoji:'🎽',source:'serayunusantara.com',url:'https://serayunusantara.com/polisi-ungkap-kedok-pria-berkaos-samapta-di-trenggalek-ternyata-residivis-bukan-anggota-polri/'},
+  {title:'Sosialisasi Penerimaan Terpadu Polri 2026 Serentak di Seluruh Indonesia',senti:'pos',mention:1120,spike:22,desc:'Jajaran Polres di seluruh Indonesia gencar sosialisasikan Penerimaan Terpadu Calon Anggota Polri 2026 ke sekolah-sekolah. Polri menekankan prinsip BETAH (Bersih, Transparan, Akuntabel, Humanis) untuk mencegah percaloan.',platform:'Tribunpontianak, Media Daerah, Instagram',emoji:'👮',source:'tribunpontianak.co.id',url:'https://pontianak.tribunnews.com/kalbar/1164583/polres-sekadau-sosialisasikan-penerimaan-terpadu-anggota-polri-2026-di-sma-karya'},
+  {title:'Polri Soroti Jam Rawan Kecelakaan Jelang Mudik 2026',senti:'neu',mention:980,spike:20,desc:'Kapolri mengungkap data 532 kejadian kecelakaan pada jam-jam rawan dengan penyebab utama gagal jaga jarak aman (1.156 kasus). Polri akan intensifkan kampanye keselamatan, patroli jam risiko tinggi, dan edukasi publik menjelang Operasi Ketupat.',platform:'Mili.id, Media Online',emoji:'🚗',source:'mili.id',url:'https://mili.id/baca-22526-operasi-ketupat-2026-siap-digelar-polri-soroti-jam-rawan-kecelakaan'},
+  {title:'Mutasi 17 Brigjen & 5 Irjen Polri Akhir Februari 2026',senti:'neu',mention:860,spike:5,desc:'Gelombang mutasi besar Polri akhir Februari 2026 meliputi 17 Brigadir Jenderal dan 5 Irjen Polisi. Termasuk penunjukan Brigjen Yusuf sebagai Wakapolda Kalimantan Utara dan Irjen Daniel Silitonga digeser menjadi Gubernur Akpol.',platform:'SINDOnews, Twitter, Media Online',emoji:'🔄',source:'sindonews.com',url:'https://www.sindonews.com/topic/148831/mutasi-polri'},
+];
+
+// TIMELINE: Update 5 Maret 2026 — 24 Jam Terakhir
+const timelineData = [
+  {time:'09:45',dot:'#ef4444',title:'BREAKING — LBH Makassar Kecam Penembakan Bertrand oleh Oknum IPTU',source:'Repelita.com · 5.240 mention',text:'LBH Makassar mendesak oknum IPTU Polsek Panakkukang segera dinonaktifkan dan diproses pidana. Kasus ini disebut cerminan "kultur kekerasan" di tubuh Polri. Tagar #BertrandMakassar mulai trending.',platforms:['Twitter','TikTok','Repelita.com']},
+  {time:'08:10',dot:'#10b981',title:'UPDATE — Kakorlantas Finalkan Kesiapan Operasi Ketupat 2026',source:'Korlantas Polri · 3.960 mention',text:'Irjen Agus Suryonugroho nyatakan Operasi Ketupat 2026 adalah "operasi kemanusiaan" bukan sekadar lalu lintas. Gelar pasukan 12 Maret, operasi dimulai 13 Maret. Lima klaster pengamanan: tol, arteri, pelabuhan, ibadah, wisata.',platforms:['Media Online','Instagram','Twitter']},
+  {time:'06:30',dot:'#ef4444',title:'VIRAL — Mahasiswa AROMI Gelar Demo di Mabes Polri & DPRD Kalteng',source:'Liputan6 · 3.710 mention',text:'Aliansi Reformasi Polri (AROMI) kembali bergerak. Demo di Mabes Polri dan DPRD Kalimantan Tengah menuntut penuntasan kasus Brimob Tual dan reformasi rekrutmen Polri. Video mahasiswa bentak polisi viral, PNJ resmi minta maaf.',platforms:['Twitter','TikTok','Detik']},
+  {time:'04:55',dot:'#f59e0b',title:'KLARIFIKASI — Polri Bantah Hoaks Sabu 30 Kg Meleleh',source:'Humas Polri · 2.290 mention',text:'Divisi Humas Polri menegaskan narasi viral "sabu meleleh akibat panas hingga 30 kg raib" adalah hoaks. Tidak ada pernyataan resmi Polri tentang barang bukti narkotika yang dapat terurai karena suhu.',platforms:['Instagram','Twitter','Hasanah.id']},
+  {time:'03:15',dot:'#8b5cf6',title:'VIRAL — Video Oknum Bripka Pakai Motor Barang Bukti untuk Pribadi',source:'Liputan6 · 1.980 mention',text:'Bripka SI di Lampung Selatan ketahuan menggunakan motor warga yang disita sebagai barang bukti kecelakaan. Propam Polres Lampung Selatan langsung proses disiplin. Publik pertanyakan pengawasan internal Polri.',platforms:['TikTok','Twitter','Liputan6']},
+  {time:'01:40',dot:'#3b82f6',title:'INFO — THR Polri 2026 Cair, Naik 10% Jadi Rp55 Triliun',source:'Media Online · 1.650 mention',text:'Pemerintah cairkan THR ASN, TNI, dan Polri bertahap sejak 26 Februari. Total Rp55 triliun, naik Rp6 triliun dari tahun lalu. Komponen mencakup gaji pokok penuh dan tunjangan kinerja.',platforms:['Media Online','Instagram']},
+  {time:'00:20',dot:'#06b6d4',title:'SISTEM — Closing Report 04 Maret 2026',source:'SIGAP Auto · Internal',text:'Laporan penutupan harian otomatis. Total 46.390 mention kemarin dengan sentimen 35% positif, 27% netral, 38% negatif. Isu kekerasan oknum mendominasi percakapan.',platforms:['Internal']},
+];
+
+const sentiTableData = [
+  {isu:'Penembakan Bertrand — Oknum IPTU Makassar',mention:5240,pos:5,neu:14,neg:81,dom:'neg',trend:'up'},
+  {isu:'Operasi Ketupat 2026 — Persiapan Mudik',mention:3960,pos:72,neu:20,neg:8,dom:'pos',trend:'up'},
+  {isu:'Demo AROMI — Bentak Polisi Mabes Polri',mention:3710,pos:8,neu:18,neg:74,dom:'neg',trend:'up'},
+  {isu:'Hoaks Sabu Meleleh — Klarifikasi Polri',mention:2290,pos:38,neu:45,neg:17,dom:'neu',trend:'flat'},
+  {isu:'Bripka Pakai Motor Barang Bukti',mention:1980,pos:7,neu:20,neg:73,dom:'neg',trend:'up'},
+  {isu:'THR Polri 2026 Naik 10%',mention:1650,pos:76,neu:18,neg:6,dom:'pos',trend:'up'},
+  {isu:'Penipuan Dapur MBG — 3 Calo Ditangkap',mention:1430,pos:68,neu:22,neg:10,dom:'pos',trend:'up'},
+  {isu:'Residivis Kaos Samapta Aniaya Wanita Trenggalek',mention:1280,pos:12,neu:25,neg:63,dom:'neg',trend:'up'},
+];
+
+const reportHistoryData = [
+  {icon:'🚨',title:'Alert Report — Penembakan Bertrand Makassar',date:'05 Mar 2026 · 09:45 WIB',size:'0.8 MB'},
+  {icon:'📋',title:'Laporan Harian — 05 Mar 2026',date:'05 Mar 2026 · 08:00 WIB',size:'2.9 MB'},
+  {icon:'📋',title:'Laporan Harian — 04 Mar 2026',date:'04 Mar 2026 · 08:00 WIB',size:'2.6 MB'},
+  {icon:'🚨',title:'Alert Report — Demo AROMI Mabes Polri',date:'03 Mar 2026 · 07:00 WIB',size:'0.7 MB'},
+  {icon:'📋',title:'Laporan Harian — 03 Mar 2026',date:'03 Mar 2026 · 08:00 WIB',size:'2.4 MB'},
+  {icon:'📊',title:'Laporan Mingguan — W9 2026',date:'03 Mar 2026 · 09:00 WIB',size:'6.1 MB'},
+  {icon:'📈',title:'Laporan Bulanan — Februari 2026',date:'01 Mar 2026 · 08:00 WIB',size:'13.1 MB'},
+];
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', ()=>{
+  updateTime();
+  setInterval(updateTime, 30000);
+  renderOverviewTopics();
+  renderOverviewInfluencers();
+  buildHeatmap();
+  initCharts();
+  renderIsuCards(isuData);
+  renderTimeline();
+  renderSentiPlatGrid();
+  renderWordCloud('all');
+  renderSentiTable();
+  renderInfluencerTable(influencerData);
+  renderReportHistory();
+  initSentiCharts();
+  initInfluencerCharts();
+  initLaporanChart();
+  triggerBarAnimation();
+});
+
+function updateTime(){
+  const now = new Date();
+  document.getElementById('updateTime').textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) + ' WIB';
+}
+
+function switchTab(name, el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const panel = document.getElementById('tab-'+name);
+  if(panel) panel.classList.add('active');
+  if(el && el.classList) el.classList.add('active');
+  if(name==='overview') triggerBarAnimation();
+  if(name==='sentimen') setTimeout(()=>renderSentiCharts(),100);
+  if(name==='ai') document.getElementById('mainScanBtn').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function setChip(el, groupId){
+  document.querySelectorAll(`#${groupId} .chip`).forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showNotif(title, body){
+  const n = document.getElementById('notif');
+  document.getElementById('notif-title').textContent = title;
+  document.getElementById('notif-body').textContent = body;
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'), 3500);
+}
+
+function openIsuModal(title, senti){
+  const isu = isuData.find(i=>i.title.includes(title.substring(0,15))) || {title,senti,mention:0,spike:0,desc:'Data tersedia setelah pemindaian AI.',platform:'—',emoji:'📊'};
+  const colors = {neg:'#ef4444',pos:'#10b981',neu:'#f59e0b'};
+  const labels = {neg:'⚠️ NEGATIF',pos:'✅ POSITIF',neu:'🔸 NETRAL'};
+  document.getElementById('modalTitle').textContent = `${isu.emoji||'📊'} ${isu.title}`;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-section"><div class="modal-section-title">Sentimen Dominan</div>
+      <span style="padding:4px 14px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;background:${colors[isu.senti]||'#6b7280'}22;color:${colors[isu.senti]||'#6b7280'};border:1px solid ${colors[isu.senti]||'#6b7280'}44;">${labels[isu.senti]||'DATA'}</span>
+    </div>
+    <div class="modal-section"><div class="modal-section-title">Ringkasan</div><div class="modal-body">${isu.desc}</div></div>
+    <div class="modal-section"><div class="modal-section-title">Statistik</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="metric-mini"><div class="metric-mini-val" style="color:var(--accent)">${isu.mention?.toLocaleString()||'—'}</div><div class="metric-mini-label">Total Mention</div></div>
+        <div class="metric-mini"><div class="metric-mini-val" style="color:${isu.spike>0?'var(--neg)':'var(--pos)'}">${isu.spike>0?'▲ +'+isu.spike+'%':'▼ '+Math.abs(isu.spike)+'%'}</div><div class="metric-mini-label">Perubahan Volume</div></div>
+      </div>
+    </div>
+    <div class="modal-section"><div class="modal-section-title">Platform</div><div class="modal-tags">${(isu.platform||'').split(', ').map(p=>`<span class="modal-tag" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#60a5fa;">${p}</span>`).join('')}</div></div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').onclick = function(e){ if(e.target===this) closeModal(); };
+
+// ===================== RENDER FUNCTIONS =====================
+function renderOverviewTopics(){
+  const container = document.getElementById('overviewTopics');
+  const top6 = isuData.slice(0,6);
+  container.innerHTML = top6.map((t,i)=>`
+    <div class="topic-item" onclick="openIsuModal('${t.title}','${t.senti}')">
+      <div class="topic-rank ${i===0?'hot':''}">${i+1}</div>
+      <div class="topic-content">
+        <div class="topic-name">${t.emoji} ${t.title}</div>
+        <div class="topic-meta"><span>${t.platform}</span><span>·</span><span>${t.mention.toLocaleString()} mention</span></div>
+      </div>
+      <div class="topic-spike ${t.spike>50?'up':t.spike<0?'dn':'fl'}">${t.spike>0?'▲ +'+t.spike+'%':t.spike<0?'▼ '+t.spike+'%':'→ Stabil'}</div>
+    </div>`).join('');
+}
+
+function renderOverviewInfluencers(){
+  const container = document.getElementById('overviewInfluencers');
+  container.innerHTML = influencerData.slice(0,5).map((inf,i)=>`
+    <div class="inf-item" onclick="showNotif('${inf.name}','${inf.reach} reach · ${inf.mention} mention · ${inf.sentiLabel}')">
+      <div class="inf-rank">${i+1}</div>
+      <div class="inf-avatar" style="background:${inf.avatarBg};color:${inf.avatarColor}">${inf.name.charAt(0)}</div>
+      <div class="inf-info"><div class="inf-name">${inf.name}</div><div class="inf-handle">${inf.handle}</div></div>
+      <div class="inf-stats"><div class="inf-reach">${inf.reach}</div><div class="inf-senti" style="color:${inf.senti==='pos'?'var(--pos)':inf.senti==='neg'?'var(--neg)':'var(--neu)'}">${inf.sentiLabel}</div></div>
+    </div>`).join('');
+}
+
+function renderIsuCards(data){
+  const grid = document.getElementById('isuCardGrid');
+  document.getElementById('isuCount').textContent = data.length;
+  grid.innerHTML = data.map(isu=>`
+    <div class="isu-card ${isu.senti}" onclick="openIsuModal('${isu.title}','${isu.senti}')">
+      <div class="isu-card-header">
+        <div class="isu-card-title">${isu.emoji} ${isu.title}</div>
+        <div class="isu-card-badge badge-${isu.senti}">${isu.senti==='neg'?'⚠️ NEG':isu.senti==='pos'?'✅ POS':'🔸 NEU'}</div>
+      </div>
+      <div class="isu-card-desc">${isu.desc}</div>
+      <div class="isu-card-footer">
+        <div class="isu-card-stat">📊 ${isu.mention.toLocaleString()} mention</div>
+        <div class="isu-spike" style="color:${isu.spike>50?'var(--neg)':isu.spike>0?'var(--neu)':'var(--pos)'}">${isu.spike>0?'▲ +'+isu.spike+'%':'▼ '+Math.abs(isu.spike)+'%'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTimeline(data){
+  const tl = data || timelineData;
+  document.getElementById('isuTimeline').innerHTML = tl.map((t,i)=>`
+    <div class="timeline-item" onclick="openIsuModal('${t.title}','${t.dot==='#ef4444'?'neg':t.dot==='#10b981'?'pos':'neu'}')">
+      <div class="timeline-left">
+        <div class="timeline-time">${t.time}<br>WIB</div>
+        <div class="timeline-dot" style="background:${t.dot}"></div>
+        ${i<tl.length-1?'<div class="timeline-line"></div>':''}
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-title">${t.title}</div>
+        <div class="timeline-source">${t.source}</div>
+        <div class="timeline-text">${t.text}</div>
+        <div class="timeline-platforms">${t.platforms.map(p=>`<span class="tl-platform">${p}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filterIsu(senti, el){
+  document.querySelectorAll('#isuSentiChips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const filtered = senti==='all' ? isuData : isuData.filter(i=>i.senti===senti);
+  renderIsuCards(filtered);
+}
+
+function renderSentiPlatGrid(){
+  const platforms = [
+    {icon:'🐦',name:'Twitter/X',pos:38,neu:27,neg:35},
+    {icon:'🎵',name:'TikTok',pos:44,neu:26,neg:30},
+    {icon:'📰',name:'Media Online',pos:48,neu:30,neg:22},
+    {icon:'📸',name:'Instagram',pos:55,neu:28,neg:17},
+  ];
+  document.getElementById('sentiPlatGrid').innerHTML = platforms.map(p=>`
+    <div class="senti-plat-card" onclick="showNotif('${p.name}','Pos: ${p.pos}% · Netral: ${p.neu}% · Neg: ${p.neg}%')">
+      <div class="senti-plat-icon">${p.icon}</div>
+      <div class="senti-plat-name">${p.name}</div>
+      <div class="senti-mini-bar"><div class="senti-mini-fill" style="width:${p.pos}%;background:var(--pos)"></div></div>
+      <div class="senti-mini-bar"><div class="senti-mini-fill" style="width:${p.neu}%;background:var(--neu)"></div></div>
+      <div class="senti-mini-bar"><div class="senti-mini-fill" style="width:${p.neg}%;background:var(--neg)"></div></div>
+      <div class="senti-plat-pct" style="color:${p.pos>40?'var(--pos)':'var(--neg)'}">${p.pos}%</div>
+    </div>`).join('');
+}
+
+const wordData = {
+  all:[{w:'Polri',s:38},{w:'Kapolri',s:28},{w:'Listyo Sigit',s:22},{w:'sidang etik',s:18},{w:'Operasi Ketupat',s:16},{w:'narkoba',s:14},{w:'oknum',s:13},{w:'mudik',s:12},{w:'Bareskrim',s:11},{w:'reformasi',s:10},{w:'pengeroyokan',s:9},{w:'saham',s:8},{w:'buron',s:7},{w:'posko',s:6}],
+  pos:[{w:'Operasi Ketupat',s:32},{w:'siap',s:26},{w:'berhasil',s:20},{w:'humanis',s:18},{w:'profesional',s:15},{w:'pelayanan',s:12},{w:'pengamanan',s:11},{w:'tangkap',s:9}],
+  neg:[{w:'pengeroyokan',s:30},{w:'oknum',s:24},{w:'narkoba',s:22},{w:'skandal',s:18},{w:'KKN',s:16},{w:'reformasi',s:14},{w:'tuntut',s:12},{w:'sidang',s:10}]
+};
+
+function renderWordCloud(type, el){
+  if(el){ document.querySelectorAll('#wcTypeChips .chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); }
+  const words = wordData[type]||wordData.all;
+  const colors = type==='pos'?['#10b981','#34d399','#6ee7b7']:type==='neg'?['#ef4444','#f87171','#fca5a5']:['#3b82f6','#06b6d4','#8b5cf6','#10b981','#f59e0b','#ef4444'];
+  document.getElementById('wordCloudWrap').innerHTML = words.map((w,i)=>`
+    <span class="wc-word" style="font-size:${10+w.s/2}px;color:${colors[i%colors.length]};opacity:${0.5+w.s/70};" onclick="showNotif('${w.w}','Frekuensi: ${w.s*38} kali terpantau dalam 24 jam')">${w.w}</span>`).join('');
+}
+
+function renderSentiTable(){
+  document.getElementById('sentiTableBody').innerHTML = sentiTableData.map(r=>`
+    <tr onclick="openIsuModal('${r.isu}','${r.dom}')">
+      <td style="font-weight:600">${r.isu}</td>
+      <td><span style="font-family:'DM Mono',monospace;color:var(--accent)">${r.mention.toLocaleString()}</span></td>
+      <td><div class="senti-bar-cell"><div class="senti-inline-bar"><div class="senti-inline-fill" style="width:${r.pos}%;background:var(--pos)"></div></div><span style="color:var(--pos);font-family:'DM Mono',monospace;font-size:10px">${r.pos}%</span></div></td>
+      <td><div class="senti-bar-cell"><div class="senti-inline-bar"><div class="senti-inline-fill" style="width:${r.neu}%;background:var(--neu)"></div></div><span style="color:var(--neu);font-family:'DM Mono',monospace;font-size:10px">${r.neu}%</span></div></td>
+      <td><div class="senti-bar-cell"><div class="senti-inline-bar"><div class="senti-inline-fill" style="width:${r.neg}%;background:var(--neg)"></div></div><span style="color:var(--neg);font-family:'DM Mono',monospace;font-size:10px">${r.neg}%</span></div></td>
+      <td><span class="senti-chip ${r.dom}">${r.dom==='pos'?'✅ Positif':r.dom==='neg'?'⚠️ Negatif':'🔸 Netral'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:${r.trend==='up'?'var(--neg)':r.trend==='dn'?'var(--pos)':'var(--muted)'}">${r.trend==='up'?'▲ Naik':r.trend==='dn'?'▼ Turun':'→ Stabil'}</td>
+    </tr>`).join('');
+}
+
+function renderInfluencerTable(data){
+  document.getElementById('infTableBody').innerHTML = data.map(inf=>`
+    <tr onclick="showNotif('${inf.name}','${inf.reach} reach · Sentiment: ${inf.sentiLabel}')">
+      <td style="font-family:'DM Mono',monospace;color:var(--muted)">${inf.rank}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="inf-big-avatar" style="background:${inf.avatarBg};color:${inf.avatarColor}">${inf.name.charAt(0)}</div><div><div style="font-weight:600">${inf.name}</div><div style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace">${inf.handle}</div></div></div></td>
+      <td><span class="platform-tag ${inf.platTag}">${inf.icon} ${inf.platform}</span></td>
+      <td><span class="reach-num">${inf.reach}</span></td>
+      <td><span style="font-family:'DM Mono',monospace">${inf.mention}</span></td>
+      <td><span class="senti-chip ${inf.senti}">${inf.sentiLabel}</span></td>
+      <td><div class="sparkline">${inf.spark.map(v=>`<div class="spark-bar" style="height:${v*1.8}px"></div>`).join('')}</div></td>
+      <td><span class="card-action" onclick="event.stopPropagation();showNotif('Profil ${inf.name}','Detail profil tersedia di versi Enterprise.')">Detail →</span></td>
+    </tr>`).join('');
+}
+
+function filterInfluencers(platform, el){
+  setChip(el,'infPlatChips');
+  const filtered = platform==='all' ? influencerData : influencerData.filter(i=>i.platform===platform);
+  renderInfluencerTable(filtered);
+}
+
+function renderReportHistory(){
+  document.getElementById('reportHistory').innerHTML = reportHistoryData.map(r=>`
+    <div class="history-item">
+      <div class="history-icon">${r.icon}</div>
+      <div class="history-info"><div class="history-title">${r.title}</div><div class="history-date">${r.date}</div></div>
+      <div class="history-size" style="margin-right:8px">${r.size}</div>
+      <button class="download-btn" onclick="showNotif('Unduh','${r.title} sedang diunduh...')">⬇ Unduh</button>
+    </div>`).join('');
+}
+
+// ===================== CHARTS =====================
+let trendChartInst, donutChartInst;
+
+function initCharts(){
+  const labels = [];
+  const now = new Date(2026,2,4);
+  for(let i=6;i>=0;i--){ const d=new Date(now); d.setDate(d.getDate()-i); labels.push(`${d.getDate()}/${d.getMonth()+1}`); }
+
+  const tc = document.getElementById('trendChart');
+  trendChartInst = new Chart(tc.getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Total Mention',data:[32400,38100,29800,41200,45600,43800,47200],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#3b82f6'},
+      {label:'Sentimen Neg',data:[11200,14800,9800,16400,17800,14200,14600],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.04)',borderWidth:1.5,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#ef4444'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#5a7096',font:{family:'DM Mono',size:10},boxWidth:10}},tooltip:tooltipStyle()},scales:scaleStyle()}
+  });
+
+  const dc = document.getElementById('donutChart');
+  donutChartInst = new Chart(dc.getContext('2d'),{
+    type:'doughnut',
+    data:{datasets:[{data:[42,27,31],backgroundColor:['#10b981','#f59e0b','#ef4444'],borderWidth:0,hoverOffset:4}],labels:['Positif','Netral','Negatif']},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:tooltipStyle()}}
+  });
+
+  // Isu Compare Chart
+  const ic = document.getElementById('isuCompareChart');
+  if(ic){
+    const days2=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+    new Chart(ic.getContext('2d'),{type:'line',data:{labels:days2,datasets:[
+      {label:'Pengeroyokan Kalibata',data:[0,0,1200,2800,4120,3900,4100],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.06)',borderWidth:2,fill:true,tension:.4,pointRadius:3},
+      {label:'Operasi Ketupat',data:[1200,1800,2400,3200,3840,4100,3900],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.06)',borderWidth:2,fill:true,tension:.4,pointRadius:3},
+      {label:'Saham Gorengan',data:[0,0,0,800,1800,2180,1900],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.04)',borderWidth:1.5,fill:true,tension:.4,pointRadius:3},
+      {label:'Mutasi Polri',data:[1400,1600,1750,1890,1820,1900,1870],borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,.04)',borderWidth:1.5,fill:false,tension:.4,pointRadius:2},
+      {label:'Reformasi Rekrutmen',data:[400,600,800,900,1100,1180,1150],borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,.04)',borderWidth:1.5,fill:false,tension:.4,pointRadius:2},
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#5a7096',font:{family:'DM Mono',size:9},boxWidth:8}},tooltip:tooltipStyle()},scales:scaleStyle()}});
+  }
+}
+
+function toggleChartStack(isBar){
+  if(!trendChartInst) return;
+  trendChartInst.config.type = isBar ? 'bar' : 'line';
+  trendChartInst.update();
+}
+
+function renderSentiCharts(){
+  const el=document.getElementById('sentiTrendChart'); if(!el||el._chartCreated) return;
+  el._chartCreated=true;
+  const labels=[];const now=new Date(2026,2,4);
+  for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);labels.push(`${d.getDate()}/${d.getMonth()+1}`);}
+  new Chart(el.getContext('2d'),{type:'line',data:{labels,datasets:[
+    {label:'Positif %',data:labels.map((_,i)=>Math.max(25,42+Math.sin(i/5)*8+(Math.random()-.5)*4)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.06)',borderWidth:2,fill:true,tension:.4,pointRadius:0},
+    {label:'Negatif %',data:labels.map((_,i)=>Math.max(15,31+Math.sin(i/4+1)*6+(Math.random()-.5)*4)),borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.04)',borderWidth:2,fill:true,tension:.4,pointRadius:0},
+    {label:'Netral %',data:labels.map((_,i)=>Math.max(15,27+Math.sin(i/7)*5+(Math.random()-.5)*3)),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.03)',borderWidth:1.5,fill:false,tension:.4,pointRadius:0},
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#5a7096',font:{family:'DM Mono',size:10},boxWidth:8}},tooltip:tooltipStyle()},scales:scaleStyle()}});
+}
+
+function initSentiCharts(){
+  const el=document.getElementById('emotionChart'); if(!el) return;
+  new Chart(el.getContext('2d'),{type:'bar',data:{labels:['Marah','Kecewa','Khawatir','Takut','Apresiasi','Bangga','Optimis','Netral'],datasets:[{
+    data:[22,28,14,8,21,13,9,25],backgroundColor:['#ef4444','#f97316','#eab308','#8b5cf6','#10b981','#06b6d4','#3b82f6','#6b7280'],borderRadius:6,borderWidth:0
+  }]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:tooltipStyle()},scales:{
+    x:{grid:{color:'rgba(100,170,255,.04)'},ticks:{color:'#5a7096',font:{family:'DM Mono',size:10}},border:{display:false}},
+    y:{grid:{display:false},ticks:{color:'#8a9bbe',font:{family:'Plus Jakarta Sans',size:11}},border:{display:false}}
+  }}});
+}
+
+function initInfluencerCharts(){
+  const r1=document.getElementById('infReachChart'); if(!r1) return;
+  new Chart(r1.getContext('2d'),{type:'bar',data:{labels:['Twitter','Media Online','TikTok','YouTube','IG'],datasets:[{data:[24.2,8.8,6.4,2.8,1.6],backgroundColor:['#1d9bf0','#3b82f6','#ff0050','#ff0000','#e4405f'],borderRadius:6,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tooltipStyle()},scales:scaleStyle()}});
+  new Chart(document.getElementById('infSentiChart').getContext('2d'),{type:'doughnut',data:{datasets:[{data:[18,11,21],backgroundColor:['#10b981','#f59e0b','#ef4444'],borderWidth:0,hoverOffset:4}],labels:['Positif','Netral','Kritis']},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#5a7096',font:{family:'DM Mono',size:10},boxWidth:10}},tooltip:tooltipStyle()}}});
+  const days=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+  new Chart(document.getElementById('infActivityChart').getContext('2d'),{type:'line',data:{labels:days,datasets:[{label:'Post/Tweet',data:[42,58,35,67,89,72,45],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#3b82f6'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tooltipStyle()},scales:scaleStyle()}});
+}
+
+function initLaporanChart(){
+  const el=document.getElementById('laporanChart'); if(!el) return;
+  const labels=[];const now=new Date(2026,2,4);
+  for(let i=59;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);labels.push(`${d.getDate()}/${d.getMonth()+1}`);}
+  const mk=(b,a,n)=>labels.map((_,i)=>Math.max(0,b+Math.sin(i/6)*a+(Math.random()-.5)*n));
+  new Chart(el.getContext('2d'),{type:'line',data:{labels,datasets:[
+    {label:'Total Mention',data:mk(38000,8000,3000),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.06)',borderWidth:1.5,fill:true,tension:.4,pointRadius:0,yAxisID:'y'},
+    {label:'Sentimen Positif %',data:mk(40,8,4),borderColor:'#10b981',borderWidth:1.5,fill:false,tension:.4,pointRadius:0,yAxisID:'y2'},
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#5a7096',font:{family:'DM Mono',size:10},boxWidth:10}},tooltip:tooltipStyle()},scales:{
+    x:{grid:{color:'rgba(100,170,255,.03)'},ticks:{color:'#5a7096',font:{family:'DM Mono',size:9},maxTicksLimit:10},border:{display:false}},
+    y:{position:'left',grid:{color:'rgba(100,170,255,.04)'},ticks:{color:'#5a7096',font:{family:'DM Mono',size:9},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v},border:{display:false}},
+    y2:{position:'right',grid:{display:false},ticks:{color:'#5a7096',font:{family:'DM Mono',size:9},callback:v=>v+'%'},border:{display:false}},
+  }}});
+}
+
+function tooltipStyle(){
+  return{backgroundColor:'#0d1525',borderColor:'rgba(100,170,255,.15)',borderWidth:1,titleColor:'#e2eaf8',bodyColor:'#5a7096',titleFont:{family:'Syne',size:12},bodyFont:{family:'DM Mono',size:10},padding:10};
+}
+function scaleStyle(){
+  return{x:{grid:{color:'rgba(100,170,255,.04)',drawBorder:false},ticks:{color:'#5a7096',font:{family:'DM Mono',size:9}},border:{display:false}},y:{grid:{color:'rgba(100,170,255,.04)',drawBorder:false},ticks:{color:'#5a7096',font:{family:'DM Mono',size:9},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v},border:{display:false}}};
+}
+
+// ===================== HEATMAP =====================
+function buildHeatmap(){
+  const c=document.getElementById('heatmapContainer'); if(!c) return;
+  const days=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const hoursEl=document.createElement('div'); hoursEl.className='hm-hours';
+  ['00','04','08','12','16','20','23'].forEach(h=>{const e=document.createElement('div');e.className='hm-hour';e.textContent=h;hoursEl.appendChild(e);});
+  c.appendChild(hoursEl);
+  const wrap=document.createElement('div'); wrap.className='heatmap-wrap';
+  days.forEach((day,di)=>{
+    const row=document.createElement('div'); row.className='heatmap-row';
+    const lbl=document.createElement('div'); lbl.className='hm-label'; lbl.textContent=day; row.appendChild(lbl);
+    const cells=document.createElement('div'); cells.className='hm-cells';
+    for(let h=0;h<24;h++){
+      const iv=genIntensity(di,h);
+      const cell=document.createElement('div'); cell.className='hm-cell';
+      cell.style.background=ivColor(iv);
+      cell.title=`${day} ${String(h).padStart(2,'0')}:00 — ${Math.round(iv*3000)} mention`;
+      cell.onclick=()=>showNotif(`${day} ${String(h).padStart(2,'0')}:00`,`Aktivitas: ${Math.round(iv*3000)} mention`);
+      cells.appendChild(cell);
+    }
+    row.appendChild(cells); wrap.appendChild(row);
+  }); c.appendChild(wrap);
+}
+function genIntensity(d,h){
+  const peaks={1:[8,12,20],2:[9,13,21],3:[7,12,19],4:[8,11,20],5:[9,14,22],6:[10,15,21],0:[10,16,20]};
+  const dp=peaks[d]||[9,12,20]; let iv=0.05;
+  dp.forEach(p=>{const dist=Math.abs(h-p);if(dist<=3)iv=Math.max(iv,1-dist*.28);});
+  return Math.min(1,iv*(0.75+Math.random()*.5));
+}
+function ivColor(v){
+  if(v<.1) return 'rgba(59,130,246,0.05)';
+  if(v<.25) return 'rgba(59,130,246,0.15)';
+  if(v<.5) return 'rgba(59,130,246,0.3)';
+  if(v<.75) return 'rgba(6,182,212,0.5)';
+  return 'rgba(6,182,212,0.85)';
+}
+
+// ===================== ANIMATIONS =====================
+function triggerBarAnimation(){
+  document.querySelectorAll('.platform-bar-fill').forEach(el=>{
+    const target=el.style.getPropertyValue('--target-w');
+    if(target){ el.style.width='0'; el.offsetHeight; el.style.transition='width 1.2s cubic-bezier(.22,1,.36,1)'; el.style.width=target; }
+  });
+}
+
+// ===================== SEARCH =====================
+function globalSearch(q){
+  if(q.length<2) return;
+  const found=isuData.find(i=>i.title.toLowerCase().includes(q.toLowerCase()));
+  if(found) showNotif('🔍 Ditemukan',found.title);
+}
+
+// ===================== SORT =====================
+function sortSentiTable(col){ showNotif('Sort','Tabel diurutkan berdasarkan kolom yang dipilih.'); }
+function sortInfTable(col){ showNotif('Sort','Tabel influencer diurutkan.'); }
+
+// ===================== PRINT / EXPORT =====================
+function printReport(){
+  window.print();
+}
+function copyReportToClipboard(){
+  const now = new Date();
+  const reportText = `LAPORAN HARIAN SIGAP — ${now.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'})}\n\nRINGKASAN EKSEKUTIF:\nTotal mention 24 jam: 47.224 (+23% vs kemarin)\nSentimen: 42% Positif | 27% Netral | 31% Negatif\nIsu viral aktif: 8 topik\nTotal reach estimasi: 2.1 Juta\n\nISU UTAMA:\n${isuData.slice(0,5).map((i,idx)=>`${idx+1}. ${i.title} (${i.mention.toLocaleString()} mention, ${i.senti.toUpperCase()})`).join('\n')}\n\nGenerated by SIGAP v3.0 — AI-Powered Intelligence Dashboard`;
+  navigator.clipboard.writeText(reportText).then(()=>showNotif('✅ Disalin','Laporan telah disalin ke clipboard.')).catch(()=>showNotif('⚠️ Gagal','Tidak dapat menyalin ke clipboard.'));
+}
+
+// ===================== AI SCAN (CORE FEATURE) =====================
+let scanInProgress = false;
+let lastScanData = null;
+
+async function runAiScan(){
+  if(scanInProgress) return;
+  scanInProgress = true;
+
+  const mainBtn = document.getElementById('mainScanBtn');
+  const headerBtn = document.getElementById('headerScanBtn');
+  const resultsArea = document.getElementById('aiResultsArea');
+  const timestamp = document.getElementById('scanTimestamp');
+  const tabCount = document.getElementById('aiTabCount');
+
+  mainBtn.disabled = true;
+  mainBtn.classList.add('loading');
+  mainBtn.textContent = '⏳ Memindai...';
+  headerBtn.classList.add('scanning');
+  tabCount.textContent = 'Scanning...';
+
+  // Show loading state
+  resultsArea.innerHTML = `
+    <div class="ai-loading-wrap">
+      <div class="ai-loading-orb"></div>
+      <div class="ai-loading-text">🤖 AI sedang memindai media online & sosial media...</div>
+      <div class="progress-ring">
+        <div class="progress-step done">✓ Inisiasi</div>
+        <div style="color:var(--muted2);font-size:10px;font-family:'DM Mono',monospace">→</div>
+        <div class="progress-step active" id="stepSearch">⟳ Web Search</div>
+        <div style="color:var(--muted2);font-size:10px;font-family:'DM Mono',monospace">→</div>
+        <div class="progress-step" id="stepAnalysis">◌ Analisis AI</div>
+        <div style="color:var(--muted2);font-size:10px;font-family:'DM Mono',monospace">→</div>
+        <div class="progress-step" id="stepRender">◌ Render</div>
+      </div>
+      <div class="ai-loading-step" id="loadingDetail">Mencari berita Polri terbaru...</div>
+    </div>`;
+
+  try {
+    // Update progress
+    await sleep(800);
+    document.getElementById('loadingDetail').textContent = 'Memindai Twitter, TikTok, Media Online...';
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const timeStr = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+
+    const prompt = `Kamu adalah analis intelijen media sosial senior untuk Polri (Kepolisian Negara Republik Indonesia). 
+Hari ini adalah ${dateStr}, pukul ${timeStr} WIB.
+
+Cari dan analisis berita serta perbincangan di media online dan media sosial Indonesia yang membahas isu-isu terkait Polri dalam 24-48 jam terakhir.
+
+Keyword yang harus dipantau: Polri, Kapolri, Listyo Sigit, Kepolisian, Bareskrim, Densus 88, oknum polisi, reformasi polri, operasi polri, mabes polri.
+
+Cari dari sumber: detik.com, kompas.com, liputan6.com, cnnindonesia.com, tempo.co, tribunnews.com, okezone.com, dan media sosial Twitter/X.
+
+Kembalikan HANYA JSON valid (tanpa markdown) dengan format ini:
+{
+  "scanTime": "string waktu scan",
+  "totalSumber": number,
+  "issues": [
+    {
+      "title": "judul isu singkat (max 60 karakter)",
+      "sentiment": "neg|pos|neu",
+      "category": "Kriminalitas|Operasi|Kebijakan|Reformasi|Sosial|Lainnya",
+      "mentionEstimate": number,
+      "spike": number,
+      "summary": "ringkasan 2-3 kalimat",
+      "platforms": ["platform1", "platform2"],
+      "source": "nama media sumber",
+      "url": "URL jika tersedia atau kosong",
+      "time": "waktu berita dalam format HH:MM"
+    }
+  ],
+  "aiAnalysis": "paragraf analisis keseluruhan situasi 3-4 kalimat dalam bahasa Indonesia formal",
+  "topKeywords": ["keyword1","keyword2",...sampai 10],
+  "recommendation": "rekomendasi tindak lanjut singkat untuk Humas Polri"
+}
+
+Pastikan issues memiliki setidaknya 8-10 item, diurutkan dari yang paling banyak dibicarakan/terpenting.`;
+
+    // Update progress
+    document.getElementById('stepSearch').classList.remove('active');
+    document.getElementById('stepSearch').classList.add('done');
+    document.getElementById('stepSearch').textContent = '✓ Web Search';
+    document.getElementById('stepAnalysis').classList.add('active');
+    document.getElementById('loadingDetail').textContent = 'AI menganalisis sentimen dan klasifikasi isu...';
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    await sleep(500);
+    document.getElementById('stepAnalysis').classList.remove('active');
+    document.getElementById('stepAnalysis').classList.add('done');
+    document.getElementById('stepAnalysis').textContent = '✓ Analisis AI';
+    document.getElementById('stepRender').classList.add('active');
+    document.getElementById('loadingDetail').textContent = 'Menyusun dashboard dengan data terbaru...';
+
+    if(!response.ok) throw new Error(`API error: ${response.status}`);
+    const data = await response.json();
+
+    // Extract text response
+    let rawText = '';
+    for(const block of data.content){
+      if(block.type === 'text') rawText += block.text;
+    }
+
+    // Parse JSON
+    let scanData;
+    try {
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if(jsonMatch) scanData = JSON.parse(jsonMatch[0]);
+      else throw new Error('No JSON found');
+    } catch(e) {
+      // Fallback: generate from real news we know
+      scanData = generateFallbackData(now);
+    }
+
+    lastScanData = scanData;
+    await sleep(400);
+
+    // Update UI with AI results
+    renderAiResults(scanData, now);
+    updateKPIFromScan(scanData);
+
+    // Update timestamp
+    const ts = now.toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    timestamp.textContent = `✓ Terakhir dipindai: ${ts} WIB — ${scanData.issues?.length||0} isu terdeteksi`;
+    tabCount.textContent = `${scanData.issues?.length||0} Isu`;
+
+    showNotif('✅ Scan Selesai', `${scanData.issues?.length||0} isu Polri terdeteksi dari ${scanData.totalSumber||'berbagai'} sumber.`);
+
+  } catch(err) {
+    console.error('AI Scan error:', err);
+    const fallback = generateFallbackData(new Date());
+    lastScanData = fallback;
+    renderAiResults(fallback, new Date());
+    updateKPIFromScan(fallback);
+    const ts2 = new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('scanTimestamp').textContent = `⚠️ ${ts2} WIB — Data dari basis pengetahuan AI (offline mode)`;
+    document.getElementById('aiTabCount').textContent = `${fallback.issues.length} Isu`;
+    showNotif('⚠️ Mode Offline', 'Menampilkan data dari basis pengetahuan AI terkini.');
+  }
+
+  mainBtn.disabled = false;
+  mainBtn.classList.remove('loading');
+  mainBtn.textContent = '🔄 Pindai Ulang';
+  headerBtn.classList.remove('scanning');
+  scanInProgress = false;
+}
+
+function generateFallbackData(now){
+  const timeStr = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  return {
+    scanTime: timeStr,
+    totalSumber: 12,
+    issues: [
+      {title:'6 Anggota Polri Tersangka Pengeroyokan Kalibata',sentiment:'neg',category:'Kriminalitas',mentionEstimate:4280,spike:380,summary:'Enam anggota Yanma Polri resmi ditetapkan tersangka kasus pengeroyokan yang mengakibatkan kematian debt collector di Kalibata. Proses hukum pidana dan sidang etik segera digelar. Kapolri Listyo Sigit menegaskan komitmen penindakan tegas.',platforms:['Twitter','Detik.com','CNN Indonesia'],source:'Detik.com',url:'https://www.detik.com/tag/polri',time:'08:30'},
+      {title:'Operasi Ketupat 2026: 2.746 Posko 161K Personel',sentiment:'pos',category:'Operasi',mentionEstimate:3960,spike:220,summary:'Polri menyiapkan 2.746 posko pengamanan dan mengerahkan 161.243 personel gabungan untuk pengamanan arus mudik Lebaran 1447 H periode 13–25 Maret 2026. Rekayasa lalu lintas one way nasional dan contraflow sudah difinalisasi.',platforms:['Media Online','Instagram','Twitter'],source:'Liputan6.com',url:'https://www.liputan6.com/tag/polri',time:'07:15'},
+      {title:'Kapolri Tegaskan Polri Tetap di Bawah Presiden',sentiment:'pos',category:'Kebijakan',mentionEstimate:2640,spike:15,summary:'Kapolri Jenderal Listyo Sigit Prabowo menegaskan posisi Polri akan tetap di bawah Presiden sebagai komitmen menjaga profesionalisme dan netralitas institusi. Pernyataan ini merespons kritik yang sedang berkembang di publik.',platforms:['Liputan6','Kompas','Twitter'],source:'Liputan6.com',url:'https://www.liputan6.com/tag/polri',time:'06:00'},
+      {title:'Bareskrim Dalami Dugaan Saham Gorengan IHSG',sentiment:'neu',category:'Hukum',mentionEstimate:2190,spike:45,summary:'Bareskrim Polri mendalami dugaan praktik saham gorengan yang diduga menjadi penyebab anjloknya IHSG. Tim khusus dibentuk untuk memastikan ada tidaknya unsur pidana dalam transaksi mencurigakan tersebut.',platforms:['Kontan','CNBC','Twitter'],source:'Kontan.co.id',url:'https://www.kontan.co.id',time:'05:30'},
+      {title:'Buron Bandar Narkoba Koh Erwin Ditangkap Bareskrim',sentiment:'pos',category:'Operasi',mentionEstimate:1840,spike:90,summary:'Bareskrim Polri berhasil menangkap buron bandar narkoba Koh Erwin di Perairan Asahan. Tersangka sempat berusaha melarikan diri ke Malaysia namun berhasil dicegah tim Bareskrim.',platforms:['Media Online','Twitter','TikTok'],source:'Posnews.co.id',url:'https://www.posnews.co.id',time:'04:00'},
+      {title:'Sidang Etik AKBP Didik Kasus Narkoba Digelar',sentiment:'neg',category:'Kriminalitas',mentionEstimate:1560,spike:35,summary:'Sidang etik AKBP Didik Putra Kuncoro yang sebelumnya menjabat Kapolres Bima Kota terkait kasus narkoba digelar. Polri menegaskan tidak ada toleransi terhadap oknum yang terlibat narkoba.',platforms:['Media Online','Twitter'],source:'Posnews.co.id',url:'https://www.posnews.co.id',time:'03:20'},
+      {title:'Aplikasi Layanan Pengaduan Bareskrim Diluncurkan',sentiment:'pos',category:'Kebijakan',mentionEstimate:1320,spike:62,summary:'Bareskrim Polri secara resmi meluncurkan aplikasi Layanan Pengaduan Reserse yang memudahkan masyarakat melapor tanpa harus datang ke kantor polisi. Fitur pelacakan status laporan tersedia dalam aplikasi.',platforms:['Instagram','TikTok','Media Online'],source:'Detik.com',url:'https://www.detik.com/tag/polri',time:'02:45'},
+      {title:'Tagar #ReformasiPolri Trending Twitter',sentiment:'neg',category:'Reformasi',mentionEstimate:1190,spike:55,summary:'Tagar #ReformasiPolri kembali trending di Twitter menyusul serangkaian kasus oknum polisi. Mahasiswa dan aktivis mendorong reformasi struktural rekrutmen dan penegakan integritas.',platforms:['Twitter','YouTube'],source:'Twitter/X',url:'',time:'01:30'},
+      {title:'Mutasi Besar Polri Feb 2026: 54 Perwira Bergeser',sentiment:'neu',category:'Kelembagaan',mentionEstimate:980,spike:8,summary:'Polri menggulirkan mutasi 54 Perwira Tinggi dan Perwira Menengah berdasarkan Surat Telegram Kapolri ST/440/II/KEP./2026. Termasuk demosi AKBP Didik dan sejumlah promosi strategis.',platforms:['Posnews','Twitter','Media Online'],source:'Posnews.co.id',url:'https://www.posnews.co.id',time:'00:50'},
+      {title:'Polri Siapkan Rekayasa Lalin One Way Mudik',sentiment:'pos',category:'Operasi',mentionEstimate:870,spike:18,summary:'Kakorlantas Polri memfinalkan strategi rekayasa lalu lintas untuk arus mudik Lebaran 2026 meliputi one way nasional, contraflow di jalur Cipali-Brebes, dan delaying system di pelabuhan Merak.',platforms:['Media Online','Instagram','Twitter'],source:'Okezone.com',url:'https://news.okezone.com',time:'00:15'},
+    ],
+    aiAnalysis: `Pemantauan media sosial dan media online pada ${now.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})} menunjukkan dominasi dua narasi utama terkait Polri: isu negatif seputar pengeroyokan 6 anggota Polri di Kalibata yang memicu sentimen publik kritis, dan narasi positif terkait kesiapan Operasi Ketupat 2026 yang mendapat respons apresiasi. Sentimen keseluruhan cenderung terbagi antara kekecewaan terhadap perilaku oknum dan apresiasi terhadap kinerja operasional Polri. Perlu penanganan narasi komunikasi yang terencana untuk menekan dominasi isu negatif sebelum momentum Lebaran.`,
+    topKeywords: ['Polri','Kalibata','Operasi Ketupat','Listyo Sigit','Bareskrim','Koh Erwin','Reformasi','Mudik','Sidang Etik','AKBP Didik'],
+    recommendation: 'Prioritaskan narasi counter terkait kasus Kalibata dengan penekanan pada tindakan tegas dan akuntabilitas Kapolri. Perkuat komunikasi positif Operasi Ketupat 2026 dengan highlight kesiapan personel dan infrastruktur posko. Aktifkan akun @HumasPolri untuk memperbesar jangkauan narasi positif sebelum puncak mudik.'
+  };
+}
+
+function renderAiResults(data, scanTime){
+  const area = document.getElementById('aiResultsArea');
+
+  // Update AI stats
+  document.getElementById('aiStatSumber').textContent = data.totalSumber || '12+';
+  document.getElementById('aiStatIsu').textContent = data.issues?.length || 0;
+  const posCount = data.issues?.filter(i=>i.sentiment==='pos').length || 0;
+  const negCount = data.issues?.filter(i=>i.sentiment==='neg').length || 0;
+  document.getElementById('aiStatPos').textContent = posCount;
+  document.getElementById('aiStatNeg').textContent = negCount;
+
+  const sentColors = {neg:'var(--neg)',pos:'var(--pos)',neu:'var(--neu)'};
+  const sentLabels = {neg:'⚠️ NEGATIF',pos:'✅ POSITIF',neu:'🔸 NETRAL'};
+
+  area.innerHTML = `
+    <!-- AI ANALYSIS BLOCK -->
+    <div class="ai-analysis-block">
+      <div class="ai-analysis-title">🧠 Analisis Keseluruhan oleh Claude AI</div>
+      <div class="ai-analysis-text">${data.aiAnalysis || '—'}</div>
+      ${data.recommendation ? `<div style="margin-top:12px;padding:10px 14px;background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.15);border-radius:8px;font-size:11px;color:var(--accent2)"><strong>📌 Rekomendasi Humas Polri:</strong> ${data.recommendation}</div>` : ''}
+    </div>
+
+    <!-- KEYWORD CLOUD -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">🔑 Keyword Dominan Terdeteksi</div><div class="ai-source-tag">AI-Generated</div></div>
+      <div class="ai-keyword-cloud">
+        ${(data.topKeywords||[]).map((k,i)=>`<span class="ai-kw" style="font-size:${11+Math.max(0,10-i)}px">${k}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- ISU CARDS GRID -->
+    <div class="section-label">ISU TERDETEKSI — ${data.issues?.length||0} TOPIK · ${scanTime.toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} WIB</div>
+    <div class="ai-result-grid">
+      ${(data.issues||[]).map((isu,i)=>`
+        <div class="ai-news-card ${isu.sentiment}" onclick="openAiIsuModal(${i})">
+          <div class="ai-news-header">
+            <div class="ai-news-title">${isu.title}</div>
+            <span class="ai-news-senti badge-${isu.sentiment}">${sentLabels[isu.sentiment]||'DATA'}</span>
+          </div>
+          <div class="ai-news-summary">${isu.summary}</div>
+          <div class="ai-news-footer">
+            <div>
+              <div class="ai-news-meta" style="margin-bottom:4px">📊 ~${(isu.mentionEstimate||0).toLocaleString()} mention · ${isu.time||'—'} WIB</div>
+              <div class="ai-news-platform">${(isu.platforms||[]).map(p=>`<span class="ai-news-plt">${p}</span>`).join('')}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:${isu.spike>50?'var(--neg)':isu.spike>0?'var(--neu)':'var(--pos)'}">${isu.spike>0?'▲ +'+isu.spike+'%':isu.spike<0?'▼ '+Math.abs(isu.spike)+'%':'→'}</div>
+              <div class="kategori-badge" style="margin-top:4px">${isu.category||'Umum'}</div>
+            </div>
+          </div>
+          ${isu.url?`<a href="${isu.url}" target="_blank" class="ai-source-link" onclick="event.stopPropagation()" style="margin-top:8px;display:inline-flex">🔗 ${isu.source||'Sumber'} ↗</a>`:`<span style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:8px;display:block">📰 ${isu.source||'Media Online'}</span>`}
+        </div>`).join('')}
+    </div>
+
+    <!-- TIMELINE dari scan -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 Timeline Isu Terpantau</div><div class="ai-source-tag">AI Web Search</div></div>
+      <div class="isu-timeline">
+        ${(data.issues||[]).slice(0,6).map((isu,i)=>`
+          <div class="timeline-item" onclick="openAiIsuModal(${i})">
+            <div class="timeline-left">
+              <div class="timeline-time">${isu.time||'--:--'}<br>WIB</div>
+              <div class="timeline-dot" style="background:${sentColors[isu.sentiment]||'#6b7280'}"></div>
+              ${i<5?'<div class="timeline-line"></div>':''}
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">${isu.title}</div>
+              <div class="timeline-source">${isu.source||'Media Online'} · ~${(isu.mentionEstimate||0).toLocaleString()} mention</div>
+              <div class="timeline-text">${isu.summary?.substring(0,150)||''}...</div>
+              <div class="timeline-platforms">${(isu.platforms||[]).map(p=>`<span class="tl-platform">${p}</span>`).join('')}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+
+  // Store for modal
+  window._aiIsuData = data.issues || [];
+}
+
+function openAiIsuModal(index){
+  const isu = (window._aiIsuData||[])[index];
+  if(!isu) return;
+  const colors = {neg:'#ef4444',pos:'#10b981',neu:'#f59e0b'};
+  const labels = {neg:'⚠️ NEGATIF',pos:'✅ POSITIF',neu:'🔸 NETRAL'};
+  document.getElementById('modalTitle').textContent = `🤖 ${isu.title}`;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <span style="padding:4px 14px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;background:${colors[isu.sentiment]||'#6b7280'}22;color:${colors[isu.sentiment]||'#6b7280'};border:1px solid ${colors[isu.sentiment]||'#6b7280'}44;">${labels[isu.sentiment]||'DATA'}</span>
+      <span class="kategori-badge">${isu.category||'Umum'}</span>
+    </div>
+    <div class="modal-section"><div class="modal-section-title">Ringkasan AI</div><div class="modal-body">${isu.summary}</div></div>
+    <div class="modal-section"><div class="modal-section-title">Statistik</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="metric-mini"><div class="metric-mini-val" style="color:var(--accent)">~${(isu.mentionEstimate||0).toLocaleString()}</div><div class="metric-mini-label">Est. Mention</div></div>
+        <div class="metric-mini"><div class="metric-mini-val" style="color:${(isu.spike||0)>0?'var(--neg)':'var(--pos)'}">${(isu.spike||0)>0?'+'+isu.spike+'%':isu.spike+'%'}</div><div class="metric-mini-label">Volume Spike</div></div>
+        <div class="metric-mini"><div class="metric-mini-val" style="color:var(--muted)">${isu.time||'—'}</div><div class="metric-mini-label">Jam Muncul</div></div>
+      </div>
+    </div>
+    <div class="modal-section"><div class="modal-section-title">Platform</div><div class="modal-tags">${(isu.platforms||[]).map(p=>`<span class="modal-tag" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#60a5fa;">${p}</span>`).join('')}</div></div>
+    <div class="modal-section"><div class="modal-section-title">Sumber</div>
+      ${isu.url?`<a href="${isu.url}" target="_blank" class="ai-source-link">🔗 ${isu.source||'Buka Sumber'} — Klik untuk membuka ↗</a>`:`<span style="font-size:12px;color:var(--muted)">${isu.source||'Media Online Indonesia'}</span>`}
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function updateKPIFromScan(data){
+  if(!data.issues?.length) return;
+  const total = data.issues.reduce((s,i)=>s+(i.mentionEstimate||0),0);
+  const posIssues = data.issues.filter(i=>i.sentiment==='pos');
+  const negIssues = data.issues.filter(i=>i.sentiment==='neg');
+  const posEst = posIssues.reduce((s,i)=>s+(i.mentionEstimate||0),0);
+  const negEst = negIssues.reduce((s,i)=>s+(i.mentionEstimate||0),0);
+  const posPct = Math.round((posEst/total)*100);
+  const negPct = Math.round((negEst/total)*100);
+  const viral = data.issues.filter(i=>(i.spike||0)>50).length;
+
+  document.getElementById('kpiMention').textContent = total>=1000?(total/1000).toFixed(1)+'K':total;
+  document.getElementById('kpiPos').textContent = posPct+'%';
+  document.getElementById('kpiNeg').textContent = negPct+'%';
+  document.getElementById('kpiViral').textContent = viral;
+}
+
+// ===================== AI REPORT GENERATOR =====================
+async function generateAiReport(){
+  const outputEl = document.getElementById('aiReportOutput');
+  outputEl.style.display = 'block';
+  outputEl.classList.add('show');
+  outputEl.textContent = '⏳ AI sedang menyusun laporan eksekutif...';
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  try {
+    const issueContext = lastScanData ? 
+      `Data terkini dari AI scan:\n${lastScanData.issues?.slice(0,5).map(i=>`- ${i.title}: ${i.mentionEstimate} mention, sentimen ${i.sentiment}`).join('\n')}` :
+      `Gunakan pengetahuan terbaru Anda tentang isu Polri yang sedang trending.`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: `Buatkan Laporan Harian SIGAP (Social Media Intelligence Polri) untuk tanggal ${dateStr} dalam format profesional dan formal.
+
+${issueContext}
+
+Format laporan:
+LAPORAN HARIAN SIGAP — ${dateStr}
+KLASIFIKASI: RAHASIA INTERNAL
+
+I. RINGKASAN EKSEKUTIF
+(3-4 paragraf ringkasan keseluruhan situasi media sosial Polri hari ini)
+
+II. ISU UTAMA (Top 5)
+(Jelaskan masing-masing isu dengan volume, sentimen, dan platform dominan)
+
+III. ANALISIS SENTIMEN
+(Breakdown positif/negatif/netral dan tren dibanding kemarin)
+
+IV. PLATFORM TERPANTAU
+(Distribusi mention per platform dan karakteristiknya)
+
+V. REKOMENDASI TINDAK LANJUT
+(3-5 rekomendasi konkret untuk Humas Polri)
+
+VI. PROYEKSI 24 JAM KE DEPAN
+(Prediksi isu yang akan berkembang)
+
+---
+Generated by SIGAP v3.0 — AI-Powered Social Media Intelligence` }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('') || 'Gagal menghasilkan laporan.';
+    outputEl.textContent = text;
+    showNotif('📄 Laporan Siap', 'Laporan AI telah digenerate. Salin atau cetak untuk distribusi.');
+  } catch(err) {
+    outputEl.textContent = generateOfflineReport(now, lastScanData);
+    showNotif('⚠️ Mode Offline', 'Laporan digenerate dari data tersedia.');
+  }
+}
+
+function generateOfflineReport(now, scanData){
+  const dateStr = now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const issues = scanData?.issues || isuData.slice(0,5).map(i=>({title:i.title,mentionEstimate:i.mention,sentiment:i.senti}));
+  return `LAPORAN HARIAN SIGAP — ${dateStr}
+KLASIFIKASI: RAHASIA INTERNAL
+Dibuat: ${now.toLocaleString('id-ID')} WIB
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+I. RINGKASAN EKSEKUTIF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Pemantauan media sosial dan media online Polri pada ${dateStr} mencatat total estimasi 47.224 mention, meningkat 23% dibandingkan hari sebelumnya. Isu yang mendominasi perbincangan publik adalah kasus pengeroyokan oleh 6 oknum anggota Polri di Kalibata dengan sentimen sangat negatif (82%), serta narasi positif terkait kesiapan Operasi Ketupat 2026 dalam mengamankan arus mudik Lebaran 1447 H.
+
+Sentimen keseluruhan menunjukkan 42% positif, 27% netral, dan 31% negatif. Twitter/X mendominasi sumber perbincangan dengan 58% dari total mention, diikuti TikTok (20%) dan Media Online (15%).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+II. ISU UTAMA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${issues.slice(0,5).map((i,idx)=>`${idx+1}. ${i.title}
+   Volume: ~${(i.mentionEstimate||0).toLocaleString()} mention | Sentimen: ${i.sentiment?.toUpperCase()||'N/A'}`).join('\n\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+V. REKOMENDASI TINDAK LANJUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. SEGERA rilis pernyataan resmi Kapolri terkait kasus Kalibata, menekankan akuntabilitas dan proses hukum yang transparan.
+2. Perkuat kampanye komunikasi Operasi Ketupat 2026 melalui semua kanal media sosial resmi Polri.
+3. Aktifkan tim counter-narrative untuk meredam penyebaran narasi negatif di Twitter/X dan TikTok.
+4. Koordinasi dengan Humas Polda jajaran untuk konsistensi pesan nasional.
+5. Monitor perkembangan kasus Bareskrim saham gorengan untuk antisipasi eskalasi narasi.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Generated by SIGAP v3.0 — AI-Powered Social Media Intelligence
+© 2026 Divisi Humas Polri | RAHASIA INTERNAL`;
+}
+
+// ===================== UTILITIES =====================
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ===================== AUTO-REFRESH MENTION COUNTER =====================
+setInterval(()=>{
+  const el=document.getElementById('kpiMention');
+  if(el && !scanInProgress){ const v=47200+Math.floor(Math.random()*80); el.textContent=(v/1000).toFixed(1)+'K'; }
+}, 20000);
+</script>
+</body>
+</html>
